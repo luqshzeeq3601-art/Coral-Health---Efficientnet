@@ -1,0 +1,162 @@
+# Baseline vs Advanced Model Comparison Plan
+
+## Background
+
+The current model (`train_v4_robust.py`) achieves **98.11% accuracy** using many advanced techniques. To demonstrate the value of these techniques in an FYP context, we need a **baseline model** that uses the same architecture (EfficientNetB0) but **without any advanced methods**, trained on the **same BHD dataset** (Bleached/Healthy/Dead coral — 720/712/150 images).
+
+---
+
+## What the Current Advanced Model Uses (to be REMOVED in baseline)
+
+| Advanced Technique | Current Model | Baseline Model |
+|---|---|---|
+| 5-Seed Ensemble | ✅ Seeds [42–46] | ❌ Single seed (42) |
+| Stochastic Weight Averaging (SWA) | ✅ Last 5 epochs | ❌ None |
+| Test-Time Augmentation (TTA) | ✅ Multi-scale + flip | ❌ None |
+| Mixup Data Augmentation | ✅ Alpha=0.1 | ❌ None |
+| Hard Example Oversampling | ✅ 20–30× for specific images | ❌ None |
+| Label Smoothing | ✅ 0.05 | ❌ None (0.0) |
+| Cosine Decay LR Schedule | ✅ Custom | ❌ Fixed LR / ReduceLROnPlateau |
+| Environmental Color Jitter | ✅ Hue + Saturation | ❌ None |
+| L2 Regularization | ✅ 0.0002 | ❌ None |
+| Dead Class Weight Boost | ✅ 1.3× multiplier | ❌ Standard balanced weights only |
+| Fine-Tuning Strategy | ✅ Unfreeze last 100 layers | ❌ Freeze all base, train head only |
+| Grad-CAM | ✅ Eigen Smooth + Aug Smooth | ❌ Standard Grad-CAM only |
+
+---
+
+## Comparison Indicators
+
+We will compare both models on the following metrics, all evaluated on the **same test set** (same split seed = 42):
+
+### 1. Overall Performance
+| Metric | Description |
+|---|---|
+| **Test Accuracy** | Overall % correct predictions |
+| **Macro-Averaged Precision** | Unweighted mean precision across 3 classes |
+| **Macro-Averaged Recall** | Unweighted mean recall across 3 classes |
+| **Macro-Averaged F1-Score** | Harmonic mean of macro precision & recall |
+| **Weighted-Averaged F1-Score** | F1 weighted by class support |
+
+### 2. Per-Class Performance
+| Metric | Description |
+|---|---|
+| **Per-Class Precision** | Precision for Healthy, Bleached, Dead |
+| **Per-Class Recall** | Recall for Healthy, Bleached, Dead |
+| **Per-Class F1-Score** | F1 for each class |
+| **Dead Class Performance** | Particularly important — Dead has only 15 test samples |
+
+### 3. Confusion Matrix
+- Side-by-side confusion matrices to visualize misclassification patterns
+
+### 4. Training Dynamics
+| Metric | Description |
+|---|---|
+| **Training Accuracy Curve** | Learning speed comparison |
+| **Validation Accuracy Curve** | Generalization comparison |
+| **Training Loss Curve** | Convergence comparison |
+| **Validation Loss Curve** | Overfitting comparison |
+| **Train-Val Gap** | Overfitting indicator |
+
+### 5. Grad-CAM Interpretability
+| Metric | Description |
+|---|---|
+| **Standard Grad-CAM Heatmaps** | Visual comparison of what the model "looks at" |
+| **Focus Quality** | Whether the model attends to coral vs background |
+
+### 6. Model Complexity
+| Metric | Description |
+|---|---|
+| **Number of Trainable Parameters** | How many params are updated during training |
+| **Training Time** | Total wall-clock time |
+| **Inference Time (per image)** | Speed of single-image prediction |
+
+---
+
+## Proposed Changes
+
+### New Folder Structure
+
+#### [NEW] `05_Baseline_Model/`
+
+```
+05_Baseline_Model/
+├── train_baseline.py          ← Training script (single model, no tricks)
+├── models/                    ← Saved model weights
+├── outputs/                   ← All evaluation outputs
+│   ├── training_history.json
+│   ├── training_history.png
+│   ├── classification_report.txt
+│   ├── classification_report.png
+│   ├── confusion_matrix.png
+│   ├── gradcam_outputs.png
+│   └── model_summary.txt
+└── compare_models.py          ← Script to generate side-by-side comparison
+```
+
+---
+
+### [NEW] `05_Baseline_Model/train_baseline.py`
+
+A simplified EfficientNetB0 training script with these characteristics:
+
+- **Architecture**: EfficientNetB0 with `include_top=False` + GlobalAveragePooling2D + Dense(3, softmax)
+- **Transfer Learning**: Freeze ALL EfficientNetB0 layers, train only the classification head
+- **No Dropout**: No dropout layer (simplest possible head)
+- **Optimizer**: Adam with fixed learning rate (1e-4)
+- **Loss**: Standard `CategoricalCrossentropy` (no label smoothing)
+- **Data Augmentation**: Basic only — horizontal flip, rotation (±15°), zoom (±10%)
+- **No Mixup**, no color jitter, no hard example oversampling
+- **Class Weights**: Standard `sklearn balanced` weights (no manual boosting)
+- **Callbacks**: ModelCheckpoint (save best val_accuracy) + EarlyStopping (patience=5)
+- **No Ensemble**: Single model, single seed (42)
+- **Evaluation**: Direct `model.predict()` — no TTA
+- **Data Split**: Same split seed (42) and same 80/10/10 ratio to ensure identical test set
+- **Grad-CAM**: Standard Grad-CAM (no eigen_smooth, no aug_smooth)
+
+The script will also save:
+- Training history (JSON + PNG plot)
+- Classification report (TXT + PNG)
+- Confusion matrix (PNG)
+- Grad-CAM samples (PNG)
+- Model summary with param counts (TXT)
+- Inference time measurement
+
+---
+
+### [NEW] `05_Baseline_Model/compare_models.py`
+
+A comparison script that:
+1. Loads evaluation outputs from both models (baseline outputs + advanced model's `03_Model_Evaluation` outputs)
+2. Generates side-by-side visualizations:
+   - Bar chart: Accuracy, Precision, Recall, F1 per class
+   - Side-by-side confusion matrices
+   - Overlaid training curves
+   - Side-by-side Grad-CAM heatmaps
+3. Outputs a summary comparison table (text + image)
+4. Saves everything to `05_Baseline_Model/outputs/comparison/`
+
+---
+
+## Verification Plan
+
+### Automated Tests
+1. Run `train_baseline.py` end-to-end and verify it completes without errors
+2. Confirm the test set is identical to the advanced model (same 159 images)
+3. Verify all output files are generated
+4. Run `compare_models.py` and verify comparison outputs are generated
+
+### Manual Verification
+- Visual inspection of Grad-CAM outputs for reasonable focus areas
+- Confirm baseline accuracy is lower than 98.11% (expected ~85-92% range for frozen backbone + no tricks)
+- Review comparison charts for clear differences
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> **Epochs**: The advanced model trains for 30 epochs. Should the baseline also train for 30 epochs, or use EarlyStopping to stop sooner? I'm proposing EarlyStopping with patience=5 (more typical for a baseline approach), but can match 30 if you prefer consistency.
+
+> [!NOTE]
+> **Data Augmentation**: The baseline uses only basic augmentation (flip, rotation, zoom). The current model additionally uses brightness jitter, shear, and environmental color jitter. This is intentional — the baseline should represent a "standard" approach without domain-specific tricks.

@@ -1,0 +1,26 @@
+{
+  "protocol": "224px canonical benchmark, 5-seed SWA ensemble, single-scale, no TTA",
+  "accuracy": 0.9811320754716981,
+  "class_order": [
+    "Healthy",
+    "Bleached",
+    "Dead"
+  ],
+  "confusion_matrix": [
+    [
+      72,
+      0,
+      0
+    ],
+    [
+      2,
+      70,
+      0
+    ],
+    [
+      0,
+      1,
+      14
+    ]
+  ]
+}

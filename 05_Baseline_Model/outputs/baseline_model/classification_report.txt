@@ -1,0 +1,14 @@
+Baseline (EfficientNetB0) - Single Model, No Advanced Methods
+Test Accuracy: 84.91%
+Training Time: 154.1s
+Inference Time: 9.6ms/image
+
+              precision    recall  f1-score   support
+
+     Healthy       0.88      0.93      0.91        72
+    Bleached       0.95      0.78      0.85        72
+        Dead       0.50      0.80      0.62        15
+
+    accuracy                           0.85       159
+   macro avg       0.78      0.84      0.79       159
+weighted avg       0.88      0.85      0.86       159

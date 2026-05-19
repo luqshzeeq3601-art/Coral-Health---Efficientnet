@@ -1,0 +1,225 @@
+{
+  "seeds": [
+    42
+  ],
+  "model_artifacts": "02_Modelling/efficientnetb0_coral/models/efficientnetb0_v4robust_seed{seed}_swa.h5",
+  "canonical_accuracy_check": 1.0,
+  "cam_mode_summaries": {
+    "vanilla": {
+      "test_images": 4,
+      "correct_predictions": 4,
+      "accuracy": 1.0,
+      "probability_majority_cam_attention_on_water": 0.75,
+      "probability_top20_cam_pixels_majority_water": 0.75,
+      "probability_area_adjusted_water_bias": 0.0,
+      "water_area_fraction": {
+        "mean": 0.8037209024234694,
+        "median": 0.8253647161989797,
+        "p75": 0.9857451769770408,
+        "max": 0.9928451849489796
+      },
+      "water_attention_mass": {
+        "mean": 0.7516003880362236,
+        "median": 0.7763716035007262,
+        "p75": 0.9771035886189594,
+        "max": 0.9849267612033171
+      },
+      "water_attention_enrichment": {
+        "mean": 0.9174813405708636,
+        "median": 0.9287244433530603,
+        "p75": 0.9912315421266227,
+        "max": 0.9920245131207749
+      },
+      "top20_water_fraction": {
+        "mean": 0.6996672470289581,
+        "median": 0.7638721584660471,
+        "p75": 0.9698335990434436,
+        "max": 0.9702072538860104
+      },
+      "by_predicted_class": {
+        "Bleached": {
+          "count": 4,
+          "majority_attention_on_water": 0.75,
+          "area_adjusted_water_bias": 0.0,
+          "median_water_attention_mass": 0.7763716035007262,
+          "median_enrichment": 0.9287244433530603
+        }
+      }
+    },
+    "eigen": {
+      "test_images": 4,
+      "correct_predictions": 4,
+      "accuracy": 1.0,
+      "probability_majority_cam_attention_on_water": 0.75,
+      "probability_top20_cam_pixels_majority_water": 0.75,
+      "probability_area_adjusted_water_bias": 0.0,
+      "water_area_fraction": {
+        "mean": 0.8037209024234694,
+        "median": 0.8253647161989797,
+        "p75": 0.9857451769770408,
+        "max": 0.9928451849489796
+      },
+      "water_attention_mass": {
+        "mean": 0.7615586291963795,
+        "median": 0.783531335116765,
+        "p75": 0.9751952732135392,
+        "max": 0.9847343592122555
+      },
+      "water_attention_enrichment": {
+        "mean": 0.9343444744147503,
+        "median": 0.9400502319455116,
+        "p75": 0.98929143792743,
+        "max": 0.9918307246087507
+      },
+      "top20_water_fraction": {
+        "mean": 0.7129085292945396,
+        "median": 0.7596153846153846,
+        "p75": 0.9563072937425269,
+        "max": 0.9678158628935831
+      },
+      "by_predicted_class": {
+        "Bleached": {
+          "count": 4,
+          "majority_attention_on_water": 0.75,
+          "area_adjusted_water_bias": 0.0,
+          "median_water_attention_mass": 0.783531335116765,
+          "median_enrichment": 0.9400502319455116
+        }
+      }
+    }
+  },
+  "mask_sensitivity_summary": [
+    {
+      "cam_mode": "vanilla",
+      "mask_name": "default",
+      "majority_water_cam_percent": 75.0,
+      "top20_majority_water_percent": 75.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 82.53647161989797,
+      "median_water_cam_mass_percent": 77.63716035007262,
+      "bleached_majority_water_cam_percent": 75.0,
+      "bleached_median_water_cam_mass_percent": 77.63716035007262,
+      "median_enrichment": 0.9287244433530603
+    },
+    {
+      "cam_mode": "vanilla",
+      "mask_name": "strict_blue",
+      "majority_water_cam_percent": 50.0,
+      "top20_majority_water_percent": 50.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 66.85666454081633,
+      "median_water_cam_mass_percent": 50.72248622573608,
+      "bleached_majority_water_cam_percent": 50.0,
+      "bleached_median_water_cam_mass_percent": 50.72248622573608,
+      "median_enrichment": 0.7354106138499608
+    },
+    {
+      "cam_mode": "vanilla",
+      "mask_name": "broad_cyan",
+      "majority_water_cam_percent": 100.0,
+      "top20_majority_water_percent": 75.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 87.45216836734694,
+      "median_water_cam_mass_percent": 85.07937088575943,
+      "bleached_majority_water_cam_percent": 100.0,
+      "bleached_median_water_cam_mass_percent": 85.07937088575943,
+      "median_enrichment": 0.9691901491623279
+    },
+    {
+      "cam_mode": "vanilla",
+      "mask_name": "high_saturation",
+      "majority_water_cam_percent": 25.0,
+      "top20_majority_water_percent": 0.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 56.47720025510205,
+      "median_water_cam_mass_percent": 36.791380040776396,
+      "bleached_majority_water_cam_percent": 25.0,
+      "bleached_median_water_cam_mass_percent": 36.791380040776396,
+      "median_enrichment": 0.7016604930059357
+    },
+    {
+      "cam_mode": "eigen",
+      "mask_name": "default",
+      "majority_water_cam_percent": 75.0,
+      "top20_majority_water_percent": 75.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 82.53647161989797,
+      "median_water_cam_mass_percent": 78.3531335116765,
+      "bleached_majority_water_cam_percent": 75.0,
+      "bleached_median_water_cam_mass_percent": 78.3531335116765,
+      "median_enrichment": 0.9400502319455116
+    },
+    {
+      "cam_mode": "eigen",
+      "mask_name": "strict_blue",
+      "majority_water_cam_percent": 50.0,
+      "top20_majority_water_percent": 25.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 66.85666454081633,
+      "median_water_cam_mass_percent": 53.41031074144299,
+      "bleached_majority_water_cam_percent": 50.0,
+      "bleached_median_water_cam_mass_percent": 53.41031074144299,
+      "median_enrichment": 0.7911144188321755
+    },
+    {
+      "cam_mode": "eigen",
+      "mask_name": "broad_cyan",
+      "majority_water_cam_percent": 100.0,
+      "top20_majority_water_percent": 100.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 87.45216836734694,
+      "median_water_cam_mass_percent": 84.85738180407054,
+      "bleached_majority_water_cam_percent": 100.0,
+      "bleached_median_water_cam_mass_percent": 84.85738180407054,
+      "median_enrichment": 0.9719310032932893
+    },
+    {
+      "cam_mode": "eigen",
+      "mask_name": "high_saturation",
+      "majority_water_cam_percent": 25.0,
+      "top20_majority_water_percent": 0.0,
+      "area_adjusted_water_bias_percent": 0.0,
+      "median_water_area_percent": 56.47720025510205,
+      "median_water_cam_mass_percent": 38.225664142152844,
+      "bleached_majority_water_cam_percent": 25.0,
+      "bleached_median_water_cam_mass_percent": 38.225664142152844,
+      "median_enrichment": 0.7370351068780041
+    }
+  ],
+  "counterfactual_summary": {
+    "test_images": 4,
+    "probability_counterfactual_sensitive": 1.0,
+    "probability_prediction_changed": 0.75,
+    "masked_confidence_drop_pp": {
+      "mean": 53.23307737708092,
+      "median": 57.86531716585159,
+      "p75": 59.26838219165802,
+      "max": 62.73798942565918
+    },
+    "shifted_confidence_drop_pp": {
+      "mean": 7.549093663692474,
+      "median": 6.770238280296326,
+      "p75": 9.480668604373932,
+      "max": 13.366711139678955
+    },
+    "largest_confidence_drop_pp": {
+      "mean": 53.23307737708092,
+      "median": 57.86531716585159,
+      "p75": 59.26838219165802,
+      "max": 62.73798942565918
+    },
+    "by_original_prediction": {
+      "Bleached": {
+        "count": 4,
+        "counterfactual_sensitive": 1.0,
+        "prediction_changed_after_counterfactual": 0.75,
+        "median_largest_confidence_drop_pp": 57.86531716585159
+      }
+    }
+  },
+  "acceptance_targets_for_future_model": {
+    "overall_majority_water_cam_below": 0.25,
+    "bleached_majority_water_cam_below": 0.35,
+    "accuracy_near_current_benchmark": 0.9811
+  }
+}

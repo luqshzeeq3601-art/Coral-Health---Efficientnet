@@ -1,0 +1,3 @@
+cam_mode,accuracy_percent,majority_water_cam_percent,top20_majority_water_percent,area_adjusted_water_bias_percent,median_water_cam_mass_percent,median_enrichment,bleached_majority_water_cam_percent,bleached_median_water_cam_mass_percent
+vanilla,100.0,75.0,75.0,0.0,77.63716035007262,0.9287244433530603,75.0,77.63716035007262
+eigen,100.0,75.0,75.0,0.0,78.3531335116765,0.9400502319455116,75.0,78.3531335116765

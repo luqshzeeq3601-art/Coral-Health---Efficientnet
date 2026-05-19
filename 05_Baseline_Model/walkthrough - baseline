@@ -1,0 +1,75 @@
+# Baseline Model Implementation — Walkthrough
+
+## What Was Created
+
+### New Folder: `05_Baseline_Model/`
+
+```
+05_Baseline_Model/
+├── train_baseline.py      ← Training script (single model, no tricks)
+├── compare_models.py      ← Side-by-side comparison generator
+├── models/                ← Will contain saved weights after training
+└── outputs/
+    └── comparison/        ← Will contain comparison charts after running compare_models.py
+```
+
+---
+
+## Key Differences: Baseline vs Advanced
+
+| Feature | Baseline (`train_baseline.py`) | Advanced (`train_v4_robust.py`) |
+|---|---|---|
+| Backbone | **Frozen** (0 trainable base layers) | Unfrozen last 100 layers |
+| Ensemble | Single model, seed 42 | 5-seed ensemble (42–46) |
+| SWA | ❌ | ✅ Last 5 epochs |
+| TTA | ❌ | ✅ Multi-scale + flip |
+| Mixup | ❌ | ✅ Alpha=0.1 |
+| Label Smoothing | ❌ (0.0) | ✅ (0.05) |
+| LR Schedule | Fixed 1e-4 | Cosine Decay |
+| Hard Example Oversampling | ❌ | ✅ 20–30× |
+| Color Jitter | ❌ | ✅ Hue + saturation |
+| Dropout | ❌ | ✅ 0.4 |
+| L2 Regularization | ❌ | ✅ 0.0002 |
+| Grad-CAM | Standard | Eigen + Aug Smooth |
+| Callbacks | Checkpoint + EarlyStopping | Checkpoint + Cosine LR + SWA |
+
+---
+
+## How to Run
+
+### Step 1: Train the Baseline Model
+```bash
+cd c:\Users\ZeeqRyz\Desktop\BASEPROJECT\05_Baseline_Model
+python train_baseline.py
+```
+
+This will produce in `outputs/`:
+- `training_history.json` + `training_history.png`
+- `classification_report.txt` + `classification_report.png`
+- `confusion_matrix.png`
+- `gradcam_outputs.png`
+- `model_summary.txt`
+- `eval_summary.json`
+
+### Step 2: Generate Comparison
+```bash
+python compare_models.py
+```
+
+This reads results from both models and produces in `outputs/comparison/`:
+- `performance_comparison.png` — bar charts (accuracy, precision, recall, F1)
+- `training_curves_comparison.png` — overlaid training curves
+- `comparison_summary_table.png` — comprehensive side-by-side table
+- `comparison_summary.txt` — text version of the table
+
+---
+
+## Data Split
+
+Both models use **the same data split** (seed 42, 80/10/10) to ensure a fair comparison on identical test images (159 samples).
+
+## Validation
+
+- ✅ Both scripts compile with no syntax errors
+- ✅ Folder structure created
+- ⏳ Awaiting user to run `train_baseline.py` (requires GPU/TensorFlow)

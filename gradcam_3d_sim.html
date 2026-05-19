@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grad-CAM 3D Simulation — Coral Reef CNN (EfficientNetB0)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #050912;
+    color: #e6edf7;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+  #scene { position: fixed; inset: 0; }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 24px 32px;
+    background: linear-gradient(180deg, rgba(5,9,18,0.9) 0%, rgba(5,9,18,0) 100%);
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 10;
+  }
+  .title { font-size: 17px; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px; display: flex; align-items: center; gap: 12px; }
+  .title span { color: #14b8a6; }
+  .title small { color: #64748b; font-weight: 500; font-size: 13px; }
+
+  .controls-right { display: flex; gap: 20px; align-items: center; }
+
+  .action-btn {
+    padding: 8px 20px; font-size: 13px; font-weight: 600;
+    border-radius: 999px; cursor: pointer;
+    background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; align-items: center; gap: 8px;
+    letter-spacing: 0.3px;
+  }
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(14, 165, 233, 0.5);
+  }
+  .action-btn.playing {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+  }
+  .action-btn.playing:hover { box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5); }
+
+  .classtabs { display: flex; gap: 8px; background: rgba(15,23,42,0.6); padding: 5px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+  .ctab {
+    padding: 6px 18px; font-size: 12px; font-weight: 600;
+    border-radius: 999px; cursor: pointer;
+    border: 1px solid transparent;
+    color: #94a3b8; background: transparent;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .ctab:hover { color: #cbd5e1; }
+  .ctab.active.healthy  { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.4); box-shadow: 0 0 20px rgba(34,197,94,0.2); }
+  .ctab.active.bleached { background: rgba(245,158,11,0.15); color: #fbbf24; border-color: rgba(245,158,11,0.4); box-shadow: 0 0 20px rgba(245,158,11,0.2); }
+  .ctab.active.dead     { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.4); box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+
+  .stepbar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 24px 30px 30px;
+    background: linear-gradient(0deg, rgba(5,9,18,1) 0%, rgba(5,9,18,0.8) 60%, transparent 100%);
+    z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .formula {
+    text-align: center;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 15px;
+    margin-bottom: 24px;
+    color: #94a3b8;
+    background: rgba(10,15,30,0.6);
+    padding: 10px 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+  }
+  .formula .pill {
+    padding: 4px 10px; border-radius: 6px; margin: 0 4px; font-weight: 600;
+    transition: all 300ms ease; border: 1px solid transparent;
+  }
+  .formula .pill.dim { opacity: 0.3; filter: grayscale(100%); }
+  .pill.sky.on    { background: rgba(14,165,233,0.15); color: #38bdf8; border-color: rgba(14,165,233,0.3); }
+  .pill.orange.on { background: rgba(249,115,22,0.15); color: #fb923c; border-color: rgba(249,115,22,0.3); }
+  .pill.violet.on { background: rgba(124,58,237,0.15); color: #a78bfa; border-color: rgba(124,58,237,0.3); }
+  .pill.teal.on   { background: rgba(13,148,136,0.15); color: #2dd4bf; border-color: rgba(13,148,136,0.3); }
+
+  .steps { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; max-width: 1200px; width: 100%; }
+  .step {
+    flex: 1; min-width: 200px; max-width: 260px;
+    padding: 18px 22px;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .step:hover { background: rgba(30,41,59,0.7); transform: translateY(-4px); border-color: rgba(255,255,255,0.15); }
+  .step .num { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; transition: color 300ms ease; }
+  .step .name { font-size: 14px; font-weight: 600; color: #f8fafc; margin-bottom: 6px; }
+  .step .desc { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  
+  .step.active { background: rgba(15,23,42,0.95); border-color: transparent; box-shadow: 0 10px 40px rgba(0,0,0,0.6); transform: translateY(-4px); }
+  .step.active.s1 { border-top: 4px solid #0ea5e9; }
+  .step.active.s2 { border-top: 4px solid #f97316; }
+  .step.active.s3 { border-top: 4px solid #7c3aed; }
+  .step.active.s4 { border-top: 4px solid #0d9488; }
+  
+  .step.active.s1 .num { color: #38bdf8; }
+  .step.active.s2 .num { color: #fb923c; }
+  .step.active.s3 .num { color: #a78bfa; }
+  .step.active.s4 .num { color: #2dd4bf; }
+
+  .panel {
+    position: fixed; top: 100px; left: 32px;
+    width: 320px; padding: 24px;
+    background: rgba(10,15,30,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 9;
+  }
+  .panel h3 { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; }
+  .panel p { font-size: 14px; color: #f8fafc; line-height: 1.6; font-weight: 400; }
+  .panel .hint { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 11px; color: #64748b; font-weight: 500; }
+
+  .scoresPanel {
+    position: fixed; top: 100px; right: 32px;
+    width: 260px; padding: 24px;
+    background: rgba(10,15,30,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 9;
+  }
+  .scoresPanel h3 { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #94a3b8; margin-bottom: 16px; text-transform: uppercase; }
+  .score { margin-bottom: 14px; }
+  .score:last-child { margin-bottom: 0; }
+  .score .lbl { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: #e2e8f0; }
+  .score .bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+  .score .fill { height: 100%; transition: width 600ms cubic-bezier(0.4,0,0.2,1); border-radius: 4px; }
+  .score.h .fill { background: #22C55E; }
+  .score.b .fill { background: #F59E0B; }
+  .score.d .fill { background: #EF4444; }
+
+  .legend {
+    position: fixed; top: 300px; right: 32px;
+    padding: 14px 18px;
+    background: rgba(10,15,30,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    font-size: 11px; font-weight: 500; color: #94a3b8;
+    backdrop-filter: blur(24px);
+    z-index: 9;
+  }
+  .legend div { margin: 4px 0; display: flex; align-items: center; }
+  .legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; }
+
+  .scene-label {
+    position: absolute;
+    top: 0; left: 0;
+    padding: 6px 14px;
+    background: rgba(10, 16, 32, 0.85);
+    border: 1px solid rgba(20, 184, 166, 0.35);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #e2e8f0;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    white-space: nowrap;
+    transition: opacity 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+  }
+  .scene-label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px 5px 0;
+    border-style: solid;
+    border-color: var(--arrow-color, rgba(20, 184, 166, 0.35)) transparent;
+    display: block;
+    width: 0;
+    transition: border-color 300ms ease;
+  }
+  .scene-label.active {
+    opacity: 1;
+    z-index: 6;
+  }
+  .scene-label.active.input {
+    border-color: #0ea5e9;
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+    --arrow-color: #0ea5e9;
+  }
+  .scene-label.active.fm {
+    border-color: #0ea5e9;
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+    --arrow-color: #0ea5e9;
+  }
+  .scene-label.active.weights {
+    border-color: #7c3aed;
+    color: #a78bfa;
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+    --arrow-color: #7c3aed;
+  }
+  .scene-label.dim {
+    opacity: 0.3;
+    border-color: rgba(148, 163, 184, 0.1);
+    --arrow-color: rgba(148, 163, 184, 0.1);
+  }
+
+  .hud-card {
+    position: fixed;
+    bottom: 230px; left: 24px;
+    width: 280px;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid #14b8a6;
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    z-index: 9;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    animation: fadeIn 200ms ease;
+  }
+  .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .hud-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #14b8a6; }
+  .hud-close { background: none; border: none; color: #64748b; font-size: 16px; cursor: pointer; line-height: 1; }
+  .hud-close:hover { color: #f43f5e; }
+  #hudContent h4 { font-size: 13px; color: #f8fafc; margin-bottom: 4px; }
+  #hudContent p { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+  #hudContent .badge { display: inline-block; padding: 2px 6px; font-size: 9px; font-weight: 600; border-radius: 4px; margin-top: 8px; background: rgba(20, 184, 166, 0.15); color: #2dd4bf; }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div id="labels-container" style="position: absolute; top: 0; left: 0; pointer-events: none; width: 100%; height: 100%; z-index: 5; overflow: hidden;">
+  <div id="lblInput" class="scene-label">Input Image</div>
+  <div id="lblFeatureMaps" class="scene-label">Feature Maps A<sup>k</sup> (14×14)</div>
+  <div id="lblAlphaWeights" class="scene-label">Channel Weights α<sub>k</sub></div>
+  <div id="lblClassScore" class="scene-label">Target Class Score y<sup>c</sup></div>
+</div>
+
+<div class="topbar">
+  <div class="title"><span>Grad-CAM</span> 3D Simulation <small>· EfficientNetB0 · Coral Reef Health</small></div>
+  <div class="controls-right">
+    <button id="btnAutoPlay" class="action-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Auto-Play Demo
+    </button>
+    <div class="classtabs">
+      <button class="ctab healthy active" data-class="healthy">Healthy</button>
+      <button class="ctab bleached" data-class="bleached">Bleached</button>
+      <button class="ctab dead" data-class="dead">Dead</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3 id="panelTitle">OVERVIEW</h3>
+  <p id="panelText">Click a step below to walk through how Grad-CAM produces an attention heatmap from the final convolutional feature maps of EfficientNetB0.</p>
+  <div class="hint">Drag to orbit · Scroll to zoom</div>
+</div>
+
+<div class="scoresPanel">
+  <h3>CLASS SCORES y^c</h3>
+  <div class="score h"><div class="lbl"><span>Healthy</span><span id="sH">99.3%</span></div><div class="bar"><div class="fill" id="fH" style="width:99.3%"></div></div></div>
+  <div class="score b"><div class="lbl"><span>Bleached</span><span id="sB">0.3%</span></div><div class="bar"><div class="fill" id="fB" style="width:0.3%"></div></div></div>
+  <div class="score d"><div class="lbl"><span>Dead</span><span id="sD">0.4%</span></div><div class="bar"><div class="fill" id="fD" style="width:0.4%"></div></div></div>
+</div>
+
+<div class="legend">
+  <div><span class="sw" style="background:#22d3ee"></span>Forward activation</div>
+  <div><span class="sw" style="background:#EF4444"></span>Gradient flow</div>
+  <div><span class="sw" style="background:linear-gradient(90deg,#3b82f6,#fde047,#ef4444)"></span>Jet heatmap</div>
+</div>
+
+<div class="stepbar">
+  <div class="formula">
+    <span class="pill teal" id="pTeal">L<sub>Grad-CAM</sub> = ReLU(</span>
+    <span class="pill violet" id="pViolet">Σ<sub>k</sub> α<sub>k</sub></span>
+    ·
+    <span class="pill sky" id="pSky">A<sup>k</sup></span>
+    <span class="pill teal" id="pTeal2">)</span>
+    &nbsp; where &nbsp;
+    <span class="pill orange" id="pOrange">α<sub>k</sub> = (1/Z) Σ<sub>ij</sub> ∂y<sup>c</sup>/∂A<sup>k</sup><sub>ij</sub></span>
+  </div>
+  <div class="steps">
+    <div class="step s1" data-step="1"><div class="num">STEP 1</div><div class="name">① Forward Pass</div><div class="desc">Image → feature maps A<sup>k</sup></div></div>
+    <div class="step s2" data-step="2"><div class="num">STEP 2</div><div class="name">② Backpropagation</div><div class="desc">Compute ∂y<sup>c</sup>/∂A<sup>k</sup></div></div>
+    <div class="step s3" data-step="3"><div class="num">STEP 3</div><div class="name">③ Pool α<sub>k</sub></div><div class="desc">Global average → weights</div></div>
+    <div class="step s4" data-step="4"><div class="num">STEP 4</div><div class="name">④ Heatmap + ReLU</div><div class="desc">Weighted sum → overlay</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+const CLASS_DATA = {
+  healthy: {
+    color: 0x22C55E, label: 'Healthy',
+    alphas: [0.82, 0.41, 0.65, 0.91, 0.33, 0.77],
+    scores: { h: 99.3, b: 0.3, d: 0.4 },
+    heatPattern: 'tight',
+    coralColors: [0xF97316, 0xA855F7, 0x22D3EE, 0xC2410C]
+  },
+  bleached: {
+    color: 0xF59E0B, label: 'Bleached',
+    alphas: [0.55, 0.79, 0.44, 0.88, 0.71, 0.63],
+    scores: { h: 4.1, b: 92.6, d: 3.3 },
+    heatPattern: 'patchy',
+    coralColors: [0xF8FAFC, 0xE2E8F0, 0xFDE68A, 0xCBD5E1]
+  },
+  dead: {
+    color: 0xEF4444, label: 'Dead',
+    alphas: [0.38, 0.62, 0.85, 0.47, 0.93, 0.56],
+    scores: { h: 1.2, b: 5.8, d: 93.0 },
+    heatPattern: 'diffuse',
+    coralColors: [0x374151, 0x166534, 0x92400E, 0x1F2937]
+  }
+};
+
+const STEP_INFO = {
+  0: { title: 'OVERVIEW', text: 'Grad-CAM explains a CNN prediction by weighting the final conv layer\'s feature maps by how much each one influences the chosen class. Click a step to begin.' },
+  1: { title: 'STEP 1 · FORWARD PASS', text: 'The coral image flows through 7 MBConv blocks of EfficientNetB0. The final conv layer outputs feature maps A^k — each detecting a different visual pattern (edges, colour, texture, branching).' },
+  2: { title: 'STEP 2 · BACKPROPAGATION', text: 'Gradients of the target class score y^c flow back through the network to the feature maps. Each gradient ∂y^c/∂A^k measures how strongly that feature map influences the prediction.' },
+  3: { title: 'STEP 3 · POOL αₖ', text: 'Each gradient map is collapsed by global average pooling into a single scalar weight αₖ. The tallest bar marks the feature map that mattered most for the chosen class.' },
+  4: { title: 'STEP 4 · HEATMAP + ReLU', text: 'Feature maps are summed weighted by αₖ, ReLU keeps only positive contributions, then upsampled to 224×224 and overlaid on the input. Red = high attention. This is the explanation.' }
+};
+
+let currentClass = 'healthy';
+let currentStep = 0;
+
+const FM_DESCRIPTIONS = [
+  { name: "Texture Extractor (Branching)", desc: "Detects the jagged edges and branch density characteristic of healthy Staghorn corals.", badge: "High Response: Healthy" },
+  { name: "Color Shift Detector (Bleached)", desc: "Highly sensitive to high-intensity white light spectrum reflection, highlighting bleached areas.", badge: "High Response: Bleached" },
+  { name: "Decay / Algae Pattern Map", desc: "Filters low-frequency brownish/greenish pixels, isolating algae decay on dead structures.", badge: "High Response: Dead" },
+  { name: "Complexity / Depth Filter", desc: "Isolates shadows and depth variation, measuring overall three-dimensional structural complexness.", badge: "Structural" },
+  { name: "Boundary Edge Detector", desc: "Enhances outer silhouettes and growth borders, helping distinguish coral bounds from flat sand.", badge: "Spatial" },
+  { name: "Pigment Contrast Map", desc: "Responds to saturated fluorescent pinks/blues active under healthy coral protein layers.", badge: "Spectral" }
+];
+
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x050912, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x050912, 20, 80);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(8, 6, 18);
+
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 8;
+controls.maxDistance = 40;
+controls.target.set(0, 1, 0);
+
+scene.add(new THREE.AmbientLight(0x6080a0, 0.7));
+const key = new THREE.DirectionalLight(0xffffff, 1.1);
+key.position.set(5, 10, 8); scene.add(key);
+const rim = new THREE.DirectionalLight(0x14B8A6, 0.7);
+rim.position.set(-8, 4, -5); scene.add(rim);
+const fill = new THREE.PointLight(0x0EA5E9, 0.8, 30);
+fill.position.set(0, 3, 6); scene.add(fill);
+
+const grid = new THREE.GridHelper(40, 40, 0x14B8A6, 0x1e293b);
+grid.material.opacity = 0.2; grid.material.transparent = true;
+grid.position.y = -2.5;
+scene.add(grid);
+
+function makeCoralTexture(colors) {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  const bg = ctx.createRadialGradient(128,128,20,128,128,180);
+  bg.addColorStop(0, '#0C2340'); bg.addColorStop(1, '#04101e');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,256,256);
+  ctx.strokeStyle = 'rgba(125,211,252,0.15)'; ctx.lineWidth = 1;
+  for (let i=0;i<5;i++){ ctx.beginPath(); ctx.moveTo(0, 30+i*45); ctx.lineTo(256, 50+i*45); ctx.stroke(); }
+  ctx.fillStyle = '#1A3A5C';
+  ctx.beginPath(); ctx.ellipse(128, 240, 160, 30, 0, 0, Math.PI*2); ctx.fill();
+  function hex(n){ return '#'+n.toString(16).padStart(6,'0'); }
+  for (let b=0; b<5; b++) {
+    const rootX = 50 + b*40 + Math.random()*15;
+    const rootY = 220;
+    ctx.strokeStyle = hex(colors[0]); ctx.lineWidth = 7; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(rootX, rootY);
+    const tipX = rootX + (Math.random()-0.5)*40;
+    const tipY = rootY - 70 - Math.random()*40;
+    ctx.quadraticCurveTo(rootX+(Math.random()-0.5)*30, rootY-50, tipX, tipY);
+    ctx.stroke();
+    for (let s=0;s<3;s++){
+      const sx = rootX + (Math.random()-0.5)*20;
+      const sy = rootY - 20 - s*15;
+      ctx.strokeStyle = hex(colors[1 + (s%2)]); ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + (Math.random()-0.5)*35, sy - 25 - Math.random()*20);
+      ctx.stroke();
+    }
+    ctx.fillStyle = hex(colors[2]);
+    ctx.beginPath(); ctx.arc(tipX, tipY, 5, 0, Math.PI*2); ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(c); tex.needsUpdate = true; return tex;
+}
+
+function makeFeatureMapTexture(seed) {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0F172A'; ctx.fillRect(0,0,128,128);
+  const r = (n) => { const x = Math.sin(seed*9999 + n*127.1) * 43758.5453; return x - Math.floor(x); };
+  for (let y=0; y<8; y++) {
+    for (let x=0; x<8; x++) {
+      const v = r(y*8+x);
+      const teal = `rgb(${Math.floor(v*50)}, ${Math.floor(150+v*100)}, ${Math.floor(130+v*80)})`;
+      ctx.fillStyle = v > 0.3 ? teal : `rgba(15,80,90,${v})`;
+      ctx.fillRect(x*16, y*16, 16, 16);
+      if (v > 0.7) {
+        ctx.fillStyle = `rgba(94,234,212,${v})`;
+        ctx.beginPath(); ctx.arc(x*16+8, y*16+8, 3, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+function makeHeatmapTexture(pattern) {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,256,256);
+  function jet(t) {
+    t = Math.max(0, Math.min(1, t));
+    let r,g,b;
+    if (t < 0.25) { r=0; g=Math.floor(t*4*255); b=255; }
+    else if (t < 0.5) { r=0; g=255; b=Math.floor((0.5-t)*4*255); }
+    else if (t < 0.75) { r=Math.floor((t-0.5)*4*255); g=255; b=0; }
+    else { r=255; g=Math.floor((1-t)*4*255); b=0; }
+    return [r,g,b];
+  }
+  const img = ctx.createImageData(256,256);
+  for (let y=0; y<256; y++) {
+    for (let x=0; x<256; x++) {
+      const i = (y*256 + x) * 4;
+      let intensity = 0;
+      const dx = (x-128)/128, dy = (y-128)/128;
+      const r = Math.sqrt(dx*dx + dy*dy);
+      if (pattern === 'tight') {
+        intensity = Math.max(0, 1 - r * 1.4);
+        intensity = Math.pow(intensity, 1.5);
+      } else if (pattern === 'patchy') {
+        const h1 = Math.exp(-(((x-80)/45)**2 + ((y-90)/40)**2));
+        const h2 = Math.exp(-(((x-170)/40)**2 + ((y-100)/45)**2));
+        const h3 = Math.exp(-(((x-128)/45)**2 + ((y-180)/40)**2));
+        intensity = Math.max(h1, h2, h3) * 0.95;
+      } else {
+        intensity = Math.max(0, 1 - r * 0.9) * 0.7;
+        intensity += (Math.sin(x*0.07)*Math.cos(y*0.07)) * 0.05;
+      }
+      intensity = Math.max(0, Math.min(1, intensity));
+      const [rr,gg,bb] = jet(intensity);
+      img.data[i] = rr; img.data[i+1] = gg; img.data[i+2] = bb;
+      img.data[i+3] = Math.floor(intensity * 230);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  return new THREE.CanvasTexture(c);
+}
+
+const sceneRoot = new THREE.Group(); scene.add(sceneRoot);
+
+// Input image
+const inputGroup = new THREE.Group();
+inputGroup.position.set(-7, 1, 0);
+sceneRoot.add(inputGroup);
+let coralTex = makeCoralTexture(CLASS_DATA.healthy.coralColors);
+const inputMat = new THREE.MeshStandardMaterial({ map: coralTex, roughness: 0.6, metalness: 0.1, emissive: 0x0c2340, emissiveIntensity: 0.2 });
+const inputPlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2), inputMat);
+inputPlane.rotation.y = 0.15;
+inputGroup.add(inputPlane);
+const frameGeo = new THREE.BoxGeometry(3.4, 3.4, 0.08);
+const frameMat = new THREE.MeshStandardMaterial({ color: 0x14B8A6, emissive: 0x0d9488, emissiveIntensity: 0.4, metalness: 0.6, roughness: 0.3 });
+const inputFrame = new THREE.Mesh(frameGeo, frameMat);
+inputFrame.position.z = -0.06;
+inputFrame.rotation.y = 0.15;
+inputGroup.add(inputFrame);
+
+let heatmapTex = makeHeatmapTexture('tight');
+const heatMat = new THREE.MeshBasicMaterial({ map: heatmapTex, transparent: true, opacity: 0, depthWrite: false });
+const heatPlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2), heatMat);
+heatPlane.position.z = 0.05;
+heatPlane.rotation.y = 0.15;
+inputGroup.add(heatPlane);
+
+// Feature maps
+const fmGroup = new THREE.Group();
+fmGroup.position.set(-1.5, 1, 0);
+sceneRoot.add(fmGroup);
+const featureMaps = [];
+for (let i=0; i<6; i++) {
+  const row = Math.floor(i/3); const col = i%3;
+  const g = new THREE.Group();
+  g.position.set(col * 1.55 - 1.55, 1.0 - row * 1.7, 0);
+  const tex = makeFeatureMapTexture(i);
+  const mat = new THREE.MeshStandardMaterial({
+    map: tex, emissive: 0x14B8A6, emissiveIntensity: 0.15,
+    metalness: 0.3, roughness: 0.5, transparent: true, opacity: 0.4
+  });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.35), mat);
+  g.add(plane);
+  const tintMat = new THREE.MeshBasicMaterial({ color: 0xF97316, transparent: true, opacity: 0, depthWrite: false });
+  const tint = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.35), tintMat);
+  tint.position.z = 0.02;
+  g.add(tint);
+  const borderGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.4, 1.4));
+  const borderMat = new THREE.LineBasicMaterial({ color: 0x14B8A6, transparent: true, opacity: 0.3 });
+  const border = new THREE.LineSegments(borderGeo, borderMat);
+  g.add(border);
+  fmGroup.add(g);
+  featureMaps.push({ group: g, plane, mat, tint, tintMat, border, borderMat, basePos: g.position.clone(), tex });
+}
+
+// Alpha bars
+const alphaGroup = new THREE.Group();
+alphaGroup.position.set(-1.5, -1.8, 0);
+sceneRoot.add(alphaGroup);
+const alphaBars = [];
+for (let i=0; i<6; i++) {
+  const col = i % 3; const row = Math.floor(i/3);
+  const geo = new THREE.BoxGeometry(0.32, 1, 0.32);
+  geo.translate(0, 0.5, 0);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x22C55E, emissive: 0x166534, emissiveIntensity: 0.5,
+    metalness: 0.4, roughness: 0.3, transparent: true, opacity: 0
+  });
+  const bar = new THREE.Mesh(geo, mat);
+  bar.position.set(col * 1.55 - 1.55, 0, row * 0.7 - 0.4);
+  bar.scale.y = 0.01;
+  alphaGroup.add(bar);
+  alphaBars.push({ mesh: bar, mat });
+}
+
+// Class node
+const classGroup = new THREE.Group();
+classGroup.position.set(6, 1.2, 0);
+sceneRoot.add(classGroup);
+const classMat = new THREE.MeshStandardMaterial({
+  color: 0x22C55E, emissive: 0x22C55E, emissiveIntensity: 0.8,
+  metalness: 0.3, roughness: 0.2
+});
+const classNode = new THREE.Mesh(new THREE.SphereGeometry(0.7, 48, 48), classMat);
+classGroup.add(classNode);
+const haloMat = new THREE.MeshBasicMaterial({ color: 0x22C55E, transparent: true, opacity: 0.15, side: THREE.BackSide });
+const halo = new THREE.Mesh(new THREE.SphereGeometry(1.1, 32, 32), haloMat);
+classGroup.add(halo);
+const classLight = new THREE.PointLight(0x22C55E, 1.5, 12);
+classGroup.add(classLight);
+
+// Marine bubbles under the sea environment effect
+const BUBBLE_COUNT = 60;
+const bubbleGeo = new THREE.BufferGeometry();
+const bubblePos = new Float32Array(BUBBLE_COUNT * 3);
+const bubbleData = [];
+for (let i = 0; i < BUBBLE_COUNT; i++) {
+  bubblePos[i * 3] = (Math.random() - 0.5) * 35;
+  bubblePos[i * 3 + 1] = -2.5 + Math.random() * 15;
+  bubblePos[i * 3 + 2] = (Math.random() - 0.5) * 35;
+  bubbleData.push({ speed: 0.8 + Math.random() * 1.2, wobbleSpeed: 1 + Math.random() * 2, wobbleScale: 0.1 + Math.random() * 0.15 });
+}
+bubbleGeo.setAttribute('position', new THREE.BufferAttribute(bubblePos, 3));
+const bubbleMat = new THREE.PointsMaterial({ color: 0x14b8a6, size: 0.08, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false });
+const bubbles = new THREE.Points(bubbleGeo, bubbleMat);
+scene.add(bubbles);
+
+// Global Average Pooling Projection Beams (connecting Feature Maps to Alpha Bars during Step 3)
+const projectionBeams = [];
+for (let i = 0; i < 6; i++) {
+  const row = Math.floor(i / 3); const col = i % 3;
+  const start = new THREE.Vector3(col * 1.55 - 1.55 - 1.5, 2.0 - row * 1.7, 0);
+  const end = new THREE.Vector3(col * 1.55 - 1.55 - 1.5, -1.8, row * 0.7 - 0.4);
+  const beamGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+  const beamMat = new THREE.LineBasicMaterial({ color: 0x7c3aed, transparent: true, opacity: 0 });
+  const line = new THREE.Line(beamGeo, beamMat);
+  sceneRoot.add(line);
+  projectionBeams.push({ line, mat: beamMat, start, end, baseStart: start.clone() });
+}
+
+// Forward particles
+const FORWARD_COUNT = 300;
+const fwdGeo = new THREE.BufferGeometry();
+const fwdPos = new Float32Array(FORWARD_COUNT * 3);
+const fwdData = [];
+for (let i=0; i<FORWARD_COUNT; i++) {
+  fwdPos[i*3] = -7 + Math.random()*0.5;
+  fwdPos[i*3+1] = 1 + (Math.random()-0.5)*2.5;
+  fwdPos[i*3+2] = (Math.random()-0.5)*2.5;
+  fwdData.push({ speed: 0.06 + Math.random()*0.06, targetFM: Math.floor(Math.random()*6) });
+}
+fwdGeo.setAttribute('position', new THREE.BufferAttribute(fwdPos, 3));
+const fwdMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.12, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const fwdParticles = new THREE.Points(fwdGeo, fwdMat);
+scene.add(fwdParticles);
+
+// Gradient arrows
+const gradArrows = [];
+for (let i=0; i<6; i++) {
+  const row = Math.floor(i/3); const col = i%3;
+  const start = new THREE.Vector3(6, 1.2, 0);
+  const end = new THREE.Vector3(col * 1.55 - 1.55 - 1.5, 1.0 - row * 1.7 + 1, 0);
+  const points = [];
+  for (let t=0; t<=20; t++) {
+    const p = t/20;
+    const x = start.x*(1-p) + end.x*p;
+    const y = start.y*(1-p) + end.y*p + Math.sin(p*Math.PI)*0.4;
+    const z = start.z*(1-p) + end.z*p;
+    points.push(new THREE.Vector3(x,y,z));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineDashedMaterial({ color: 0xEF4444, dashSize: 0.15, gapSize: 0.1, transparent: true, opacity: 0, linewidth: 2 });
+  const line = new THREE.Line(geo, mat);
+  line.computeLineDistances();
+  scene.add(line);
+  gradArrows.push({ line, mat });
+}
+
+// Backprop particles
+const BACK_COUNT = 200;
+const backGeo = new THREE.BufferGeometry();
+const backPos = new Float32Array(BACK_COUNT * 3);
+const backData = [];
+for (let i=0; i<BACK_COUNT; i++) {
+  backPos[i*3] = 6; backPos[i*3+1] = 1.2; backPos[i*3+2] = 0;
+  backData.push({ targetFM: i % 6, progress: Math.random(), speed: 0.025 + Math.random()*0.035 });
+}
+backGeo.setAttribute('position', new THREE.BufferAttribute(backPos, 3));
+const backMat = new THREE.PointsMaterial({ color: 0xf87171, size: 0.16, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const backParticles = new THREE.Points(backGeo, backMat);
+scene.add(backParticles);
+
+// State + step logic
+const animState = {
+  fmActivation: 0, fmGradTint: 0, fmFade: 0, alphaBarsHeight: 0,
+  heatmapOpacity: 0, fwdOpacity: 0, backOpacity: 0, gradArrowOpacity: 0, classGlow: 0.6
+};
+const targetState = { ...animState };
+const camTargetPos = new THREE.Vector3(8, 6, 18);
+const camTargetLook = new THREE.Vector3(0, 1, 0);
+
+function setStep(step) {
+  currentStep = step;
+  targetState.fmActivation = 0; targetState.fmGradTint = 0; targetState.fmFade = 0;
+  targetState.alphaBarsHeight = 0; targetState.heatmapOpacity = 0;
+  targetState.fwdOpacity = 0; targetState.backOpacity = 0;
+  targetState.gradArrowOpacity = 0; targetState.classGlow = 0.6;
+
+  if (step === 1) { targetState.fmActivation = 1; targetState.fwdOpacity = 1; }
+  else if (step === 2) { targetState.fmActivation = 1; targetState.fmGradTint = 0.6; targetState.backOpacity = 1; targetState.gradArrowOpacity = 1; targetState.classGlow = 1.5; }
+  else if (step === 3) { targetState.fmActivation = 1; targetState.fmFade = 0.7; targetState.alphaBarsHeight = 1; }
+  else if (step === 4) { targetState.fmActivation = 1; targetState.alphaBarsHeight = 1; targetState.heatmapOpacity = 0.85; targetState.classGlow = 1.2; }
+
+  document.querySelectorAll('.step').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.step) === step);
+  });
+  const info = STEP_INFO[step] || STEP_INFO[0];
+  document.getElementById('panelTitle').textContent = info.title;
+  document.getElementById('panelText').textContent = info.text;
+
+  document.getElementById('pSky').className    = 'pill sky '    + (step >= 1 ? 'on' : 'dim');
+  document.getElementById('pOrange').className = 'pill orange ' + (step === 2 ? 'on' : 'dim');
+  document.getElementById('pViolet').className = 'pill violet ' + (step >= 3 ? 'on' : 'dim');
+  document.getElementById('pTeal').className   = 'pill teal '   + (step === 4 ? 'on' : 'dim');
+  document.getElementById('pTeal2').className  = 'pill teal '   + (step === 4 ? 'on' : 'dim');
+
+  const camTargets = {
+    0: { pos: [8, 6, 18],   look: [0, 1, 0] },
+    1: { pos: [-2, 4, 14],  look: [-2, 1, 0] },
+    2: { pos: [4, 5, 14],   look: [1, 1, 0] },
+    3: { pos: [-1, 2, 13],  look: [-1, -1, 0] },
+    4: { pos: [-4, 3, 12],  look: [-6, 1, 0] }
+  };
+  const t = camTargets[step] || camTargets[0];
+  camTargetPos.set(...t.pos);
+  camTargetLook.set(...t.look);
+
+  // Update floating scene label active states
+  const labels = {
+    lblInput: document.getElementById('lblInput'),
+    lblFeatureMaps: document.getElementById('lblFeatureMaps'),
+    lblAlphaWeights: document.getElementById('lblAlphaWeights'),
+    lblClassScore: document.getElementById('lblClassScore')
+  };
+
+  Object.values(labels).forEach(el => {
+    if (el) {
+      el.className = 'scene-label dim';
+      el.style.borderColor = '';
+      el.style.color = '';
+      el.style.boxShadow = '';
+      el.style.setProperty('--arrow-color', 'rgba(148, 163, 184, 0.1)');
+    }
+  });
+
+  const classColorMap = {
+    healthy: '#22c55e',
+    bleached: '#f59e0b',
+    dead: '#ef4444'
+  };
+  const activeClassColor = classColorMap[currentClass];
+
+  if (step === 0) {
+    Object.values(labels).forEach(el => { if (el) el.className = 'scene-label'; });
+  } else if (step === 1) {
+    if (labels.lblInput) labels.lblInput.className = 'scene-label active input';
+    if (labels.lblFeatureMaps) labels.lblFeatureMaps.className = 'scene-label active fm';
+  } else if (step === 2) {
+    if (labels.lblClassScore) {
+      labels.lblClassScore.className = 'scene-label active class-score';
+      labels.lblClassScore.style.borderColor = activeClassColor;
+      labels.lblClassScore.style.color = activeClassColor;
+      labels.lblClassScore.style.boxShadow = `0 0 15px ${activeClassColor}4d`;
+      labels.lblClassScore.style.setProperty('--arrow-color', activeClassColor);
+    }
+    if (labels.lblFeatureMaps) labels.lblFeatureMaps.className = 'scene-label active fm';
+  } else if (step === 3) {
+    if (labels.lblFeatureMaps) labels.lblFeatureMaps.className = 'scene-label active fm';
+    if (labels.lblAlphaWeights) labels.lblAlphaWeights.className = 'scene-label active weights';
+  } else if (step === 4) {
+    if (labels.lblAlphaWeights) labels.lblAlphaWeights.className = 'scene-label active weights';
+    if (labels.lblFeatureMaps) labels.lblFeatureMaps.className = 'scene-label active fm';
+    if (labels.lblInput) labels.lblInput.className = 'scene-label active input';
+  }
+}
+
+function setClass(cls) {
+  currentClass = cls;
+  const d = CLASS_DATA[cls];
+  document.querySelectorAll('.ctab').forEach(t => t.classList.toggle('active', t.dataset.class === cls));
+
+  document.getElementById('sH').textContent = d.scores.h.toFixed(1) + '%';
+  document.getElementById('sB').textContent = d.scores.b.toFixed(1) + '%';
+  document.getElementById('sD').textContent = d.scores.d.toFixed(1) + '%';
+  document.getElementById('fH').style.width = d.scores.h + '%';
+  document.getElementById('fB').style.width = d.scores.b + '%';
+  document.getElementById('fD').style.width = d.scores.d + '%';
+
+  inputMat.map = makeCoralTexture(d.coralColors); inputMat.needsUpdate = true;
+  heatMat.map = makeHeatmapTexture(d.heatPattern); heatMat.needsUpdate = true;
+
+  classMat.color.setHex(d.color);
+  classMat.emissive.setHex(d.color);
+  haloMat.color.setHex(d.color);
+  classLight.color.setHex(d.color);
+
+  alphaBars.forEach((b) => {
+    b.mat.color.setHex(d.color);
+    b.mat.emissive.setHex(d.color);
+  });
+
+  const lbl = document.getElementById('lblClassScore');
+  if (lbl && lbl.classList.contains('active')) {
+    const classColorMap = { healthy: '#22c55e', bleached: '#f59e0b', dead: '#ef4444' };
+    const activeClassColor = classColorMap[cls];
+    lbl.style.borderColor = activeClassColor;
+    lbl.style.color = activeClassColor;
+    lbl.style.boxShadow = `0 0 15px ${activeClassColor}4d`;
+    lbl.style.setProperty('--arrow-color', activeClassColor);
+  }
+}
+
+document.querySelectorAll('.step').forEach(el => {
+  el.addEventListener('click', () => setStep(parseInt(el.dataset.step)));
+});
+document.querySelectorAll('.ctab').forEach(t => {
+  t.addEventListener('click', () => setClass(t.dataset.class));
+});
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const clock = new THREE.Clock();
+function lerp(a, b, t) { return a + (b-a)*t; }
+
+const tempV = new THREE.Vector3();
+function updateLabel(elementId, position) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  tempV.copy(position);
+  tempV.project(camera);
+  const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+  if (tempV.z > 1) {
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'block';
+    el.style.transform = `translate(-50%, -100%) translate(${x}px, ${y}px)`;
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const t = clock.elapsedTime;
+
+  const k = 1 - Math.exp(-dt * 4);
+  for (const key in animState) animState[key] = lerp(animState[key], targetState[key], k);
+
+  camera.position.lerp(camTargetPos, dt * 1.5);
+  controls.target.lerp(camTargetLook, dt * 1.5);
+
+  const d = CLASS_DATA[currentClass];
+  featureMaps.forEach((fm, i) => {
+    const baseOpacity = lerp(0.4, 1.0, animState.fmActivation);
+    fm.mat.opacity = baseOpacity * (1 - animState.fmFade * 0.6);
+    fm.mat.emissiveIntensity = 0.15 + animState.fmActivation * 0.4 + Math.sin(t*2 + i)*0.05*animState.fmActivation;
+    fm.borderMat.opacity = 0.3 + animState.fmActivation * 0.6;
+    fm.tintMat.opacity = animState.fmGradTint * (0.35 + Math.sin(t*3 + i*0.7)*0.1);
+    fm.group.position.y = fm.basePos.y + Math.sin(t*0.8 + i*0.5) * 0.05;
+    if (currentStep === 4) {
+      const a = d.alphas[i];
+      const s = 0.7 + a * 0.5;
+      fm.group.scale.lerp(new THREE.Vector3(s, s, 1), dt * 3);
+    } else {
+      fm.group.scale.lerp(new THREE.Vector3(1, 1, 1), dt * 3);
+    }
+  });
+
+  alphaBars.forEach((b, i) => {
+    const a = d.alphas[i];
+    const targetH = animState.alphaBarsHeight * (0.2 + a * 2.5);
+    b.mesh.scale.y = lerp(b.mesh.scale.y, Math.max(0.01, targetH), k);
+    b.mat.opacity = animState.alphaBarsHeight;
+    b.mat.emissiveIntensity = 0.5 + Math.sin(t*2 + i*0.6) * 0.15;
+  });
+
+  heatMat.opacity = animState.heatmapOpacity * (0.85 + Math.sin(t*1.5)*0.05);
+
+  classMat.emissiveIntensity = animState.classGlow + Math.sin(t*2)*0.15;
+  haloMat.opacity = 0.1 + animState.classGlow * 0.15;
+  classLight.intensity = animState.classGlow * 1.2;
+  const pulse = 1 + Math.sin(t*2)*0.04;
+  classNode.scale.setScalar(pulse);
+
+  fwdMat.opacity = animState.fwdOpacity * 0.85;
+  if (animState.fwdOpacity > 0.01) {
+    const pos = fwdParticles.geometry.attributes.position.array;
+    for (let i=0; i<FORWARD_COUNT; i++) {
+      const p = fwdData[i];
+      pos[i*3] += p.speed;
+      const fm = featureMaps[p.targetFM];
+      const targetY = fm.basePos.y + fmGroup.position.y;
+      pos[i*3+1] += (targetY - pos[i*3+1]) * 0.02;
+      pos[i*3+2] += (-pos[i*3+2]) * 0.02;
+      if (pos[i*3] > -1) {
+        pos[i*3] = -7 + Math.random()*0.5;
+        pos[i*3+1] = 1 + (Math.random()-0.5)*2.5;
+        pos[i*3+2] = (Math.random()-0.5)*2.5;
+        p.targetFM = Math.floor(Math.random()*6);
+      }
+    }
+    fwdParticles.geometry.attributes.position.needsUpdate = true;
+  }
+
+  backMat.opacity = animState.backOpacity * 0.9;
+  if (animState.backOpacity > 0.01) {
+    const pos = backParticles.geometry.attributes.position.array;
+    for (let i=0; i<BACK_COUNT; i++) {
+      const p = backData[i];
+      p.progress += p.speed;
+      if (p.progress > 1) { p.progress = 0; p.targetFM = Math.floor(Math.random()*6); }
+      const fm = featureMaps[p.targetFM];
+      const sx = 6, sy = 1.2, sz = 0;
+      const ex = fm.basePos.x + fmGroup.position.x;
+      const ey = fm.basePos.y + fmGroup.position.y;
+      const tt = p.progress;
+      pos[i*3]   = sx*(1-tt) + ex*tt;
+      pos[i*3+1] = sy*(1-tt) + ey*tt + Math.sin(tt*Math.PI)*0.4;
+      pos[i*3+2] = sz*(1-tt);
+    }
+    backParticles.geometry.attributes.position.needsUpdate = true;
+  }
+
+  gradArrows.forEach((a, i) => {
+    a.mat.opacity = animState.gradArrowOpacity * (0.5 + d.alphas[i]*0.5);
+    a.mat.dashSize = 0.15 + (Math.sin(t*3 + i)*0.05);
+  });
+
+  if (currentStep === 0) {
+    sceneRoot.rotation.y = Math.sin(t*0.15) * 0.15;
+  } else {
+    sceneRoot.rotation.y = lerp(sceneRoot.rotation.y, 0, dt * 2);
+  }
+
+  // Update floating scene label locations dynamically from 3D world space coordinates
+  const worldPos = new THREE.Vector3();
+
+  inputGroup.getWorldPosition(worldPos);
+  worldPos.y += 1.8;
+  updateLabel('lblInput', worldPos);
+
+  fmGroup.getWorldPosition(worldPos);
+  worldPos.y += 2.2;
+  updateLabel('lblFeatureMaps', worldPos);
+
+  alphaGroup.getWorldPosition(worldPos);
+  worldPos.y += 1.6;
+  updateLabel('lblAlphaWeights', worldPos);
+
+  classGroup.getWorldPosition(worldPos);
+  worldPos.y += 1.2;
+  updateLabel('lblClassScore', worldPos);
+
+  // Update marine bubbles
+  const bPos = bubbles.geometry.attributes.position.array;
+  for (let i = 0; i < BUBBLE_COUNT; i++) {
+    const data = bubbleData[i];
+    bPos[i * 3 + 1] += data.speed * dt;
+    bPos[i * 3] += Math.sin(t * data.wobbleSpeed) * data.wobbleScale * dt * 10;
+    if (bPos[i * 3 + 1] > 12) {
+      bPos[i * 3 + 1] = -2.5;
+      bPos[i * 3] = (Math.random() - 0.5) * 35;
+      bPos[i * 3 + 2] = (Math.random() - 0.5) * 35;
+    }
+  }
+  bubbles.geometry.attributes.position.needsUpdate = true;
+
+  // Update global average pooling projection beams
+  projectionBeams.forEach((beam, i) => {
+    const fm = featureMaps[i];
+    beam.start.copy(beam.baseStart);
+    beam.start.y += Math.sin(t * 0.8 + i * 0.5) * 0.05;
+    beam.line.geometry.setFromPoints([beam.start, beam.end]);
+    beam.mat.opacity = animState.fmFade * 0.7;
+  });
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// Raycasting / Click feature map inspection logic
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+window.addEventListener('click', (event) => {
+  if (event.target.closest('.panel') || event.target.closest('.scoresPanel') || event.target.closest('.topbar') || event.target.closest('.stepbar') || event.target.closest('.hud-card') || event.target.closest('.legend')) {
+    return;
+  }
+
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const planes = featureMaps.map(fm => fm.plane);
+  const intersects = raycaster.intersectObjects(planes);
+
+  if (intersects.length > 0) {
+    const clickedPlane = intersects[0].object;
+    const index = featureMaps.findIndex(fm => fm.plane === clickedPlane);
+    if (index !== -1) {
+      showFMInspector(index);
+    }
+  } else {
+    closeInspector();
+  }
+});
+
+function showFMInspector(index) {
+  const card = document.getElementById('inspectorCard');
+  const content = document.getElementById('hudContent');
+  if (!card || !content) return;
+  
+  const data = FM_DESCRIPTIONS[index];
+  content.innerHTML = `
+    <h4>Map #${index + 1}: ${data.name}</h4>
+    <p>${data.desc}</p>
+    <div class="badge">${data.badge}</div>
+  `;
+  card.style.display = 'block';
+
+  featureMaps.forEach((fm, idx) => {
+    if (idx === index) {
+      fm.borderMat.color.setHex(0x14b8a6);
+      fm.borderMat.opacity = 1.0;
+    } else {
+      fm.borderMat.color.setHex(0x14b8a6);
+      fm.borderMat.opacity = 0.3;
+    }
+  });
+}
+
+function closeInspector() {
+  const card = document.getElementById('inspectorCard');
+  if (card) card.style.display = 'none';
+  
+  featureMaps.forEach(fm => {
+    fm.borderMat.color.setHex(0x14b8a6);
+    fm.borderMat.opacity = 0.3 + animState.fmActivation * 0.6;
+  });
+}
+
+let autoPlayTimer = null;
+let isAutoPlaying = false;
+const btnAutoPlay = document.getElementById('btnAutoPlay');
+const playIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+const pauseIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+
+function toggleAutoPlay() {
+  isAutoPlaying = !isAutoPlaying;
+  if (isAutoPlaying) {
+    btnAutoPlay.innerHTML = pauseIcon + ' Stop Auto-Play';
+    btnAutoPlay.classList.add('playing');
+    if (currentStep === 4) setStep(0);
+    else if (currentStep === 0) setStep(1);
+    
+    autoPlayTimer = setInterval(() => {
+      let nextStep = currentStep + 1;
+      if (nextStep > 4) {
+        const classes = ['healthy', 'bleached', 'dead'];
+        let idx = classes.indexOf(currentClass);
+        let nextClass = classes[(idx + 1) % classes.length];
+        setClass(nextClass);
+        nextStep = 1;
+      }
+      setStep(nextStep);
+    }, 4500);
+  } else {
+    btnAutoPlay.innerHTML = playIcon + ' Auto-Play Demo';
+    btnAutoPlay.classList.remove('playing');
+    clearInterval(autoPlayTimer);
+  }
+}
+if(btnAutoPlay) btnAutoPlay.addEventListener('click', toggleAutoPlay);
+
+setClass('healthy');
+setStep(0);
+animate();
+</script>
+</body>
+</html>

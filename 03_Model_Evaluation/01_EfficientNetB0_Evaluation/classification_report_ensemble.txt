@@ -1,0 +1,12 @@
+V4 Robust (EfficientNetB0) - 5-Seed SWA Ensemble (224px Canonical Benchmark)
+Ensemble Accuracy: 98.11%
+
+              precision    recall  f1-score   support
+
+     Healthy       0.97      1.00      0.99        72
+    Bleached       0.99      0.97      0.98        72
+        Dead       1.00      0.93      0.97        15
+
+    accuracy                           0.98       159
+   macro avg       0.99      0.97      0.98       159
+weighted avg       0.98      0.98      0.98       159

@@ -1,0 +1,181 @@
+{
+    "title": "Three-Model Architecture Comparison",
+    "class_order": [
+        "Healthy",
+        "Bleached",
+        "Dead"
+    ],
+    "note": "EfficientNetB0 parameter count uses total 5-model ensemble parameters.",
+    "source_files": {
+        "efficientnetb0_report": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\classification_report_ensemble.txt",
+        "efficientnetb0_confusion_matrix": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\confusion_matrix_ensemble.json",
+        "resnet50_summary": "02_Modelling\\resnet50_coral\\outputs\\run_summary_resnet50.json",
+        "resnet50_confusion_matrix": "02_Modelling\\resnet50_coral\\outputs\\confusion_matrix_resnet50.json",
+        "convnexttiny_summary": "02_Modelling\\convnexttiny_coral\\outputs\\run_summary_convnexttiny.json",
+        "convnexttiny_confusion_matrix": "02_Modelling\\convnexttiny_coral\\outputs\\confusion_matrix_convnexttiny.json"
+    },
+    "models": [
+        {
+            "model": "EfficientNetB0 Ensemble",
+            "model_type": "5-seed SWA ensemble",
+            "protocol": "224px canonical benchmark, 5-seed SWA ensemble, single-scale, no TTA",
+            "parameters": 20267070,
+            "parameters_m": 20.26707,
+            "confusion_matrix": [
+                [
+                    72,
+                    0,
+                    0
+                ],
+                [
+                    2,
+                    70,
+                    0
+                ],
+                [
+                    0,
+                    1,
+                    14
+                ]
+            ],
+            "accuracy": 0.9811320754716981,
+            "accuracy_percent": 98.11320754716981,
+            "macro_precision": 0.98629615531024,
+            "macro_recall": 0.9685185185185187,
+            "macro_f1": 0.9769465300877678,
+            "weighted_precision": 0.9813834562705145,
+            "weighted_recall": 0.9811320754716981,
+            "weighted_f1": 0.9810438222662714,
+            "total_errors": 3,
+            "test_samples": 159,
+            "per_class": {
+                "Healthy": {
+                    "precision": 0.972972972972973,
+                    "recall": 1.0,
+                    "f1": 0.9863013698630138,
+                    "support": 72
+                },
+                "Bleached": {
+                    "precision": 0.9859154929577465,
+                    "recall": 0.9722222222222222,
+                    "f1": 0.979020979020979,
+                    "support": 72
+                },
+                "Dead": {
+                    "precision": 1.0,
+                    "recall": 0.9333333333333333,
+                    "f1": 0.9655172413793104,
+                    "support": 15
+                }
+            }
+        },
+        {
+            "model": "ResNet50 Single",
+            "model_type": "Single robust SWA model",
+            "protocol": "224px single-scale, no TTA",
+            "parameters": 23593859,
+            "parameters_m": 23.593859,
+            "confusion_matrix": [
+                [
+                    72,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    71,
+                    1
+                ],
+                [
+                    0,
+                    2,
+                    13
+                ]
+            ],
+            "accuracy": 0.9811320754716981,
+            "accuracy_percent": 98.11320754716981,
+            "macro_precision": 0.9670580560991521,
+            "macro_recall": 0.950925925925926,
+            "macro_f1": 0.9586206896551724,
+            "weighted_precision": 0.9808551489864491,
+            "weighted_recall": 0.9811320754716981,
+            "weighted_f1": 0.980871828236825,
+            "total_errors": 3,
+            "test_samples": 159,
+            "per_class": {
+                "Healthy": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 72
+                },
+                "Bleached": {
+                    "precision": 0.9726027397260274,
+                    "recall": 0.9861111111111112,
+                    "f1": 0.9793103448275863,
+                    "support": 72
+                },
+                "Dead": {
+                    "precision": 0.9285714285714286,
+                    "recall": 0.8666666666666667,
+                    "f1": 0.896551724137931,
+                    "support": 15
+                }
+            }
+        },
+        {
+            "model": "ConvNeXtTiny Single",
+            "model_type": "Single robust SWA model",
+            "protocol": "224px single-scale, no TTA",
+            "parameters": 27822435,
+            "parameters_m": 27.822435,
+            "confusion_matrix": [
+                [
+                    71,
+                    1,
+                    0
+                ],
+                [
+                    2,
+                    70,
+                    0
+                ],
+                [
+                    1,
+                    0,
+                    14
+                ]
+            ],
+            "accuracy": 0.9748427672955975,
+            "accuracy_percent": 97.48427672955975,
+            "macro_precision": 0.9817916508057353,
+            "macro_recall": 0.9638888888888889,
+            "macro_f1": 0.9723803200421056,
+            "weighted_precision": 0.9752641293964706,
+            "weighted_recall": 0.9748427672955975,
+            "weighted_f1": 0.9748406689966926,
+            "total_errors": 4,
+            "test_samples": 159,
+            "per_class": {
+                "Healthy": {
+                    "precision": 0.9594594594594594,
+                    "recall": 0.9861111111111112,
+                    "f1": 0.9726027397260274,
+                    "support": 72
+                },
+                "Bleached": {
+                    "precision": 0.9859154929577465,
+                    "recall": 0.9722222222222222,
+                    "f1": 0.979020979020979,
+                    "support": 72
+                },
+                "Dead": {
+                    "precision": 1.0,
+                    "recall": 0.9333333333333333,
+                    "f1": 0.9655172413793104,
+                    "support": 15
+                }
+            }
+        }
+    ]
+}

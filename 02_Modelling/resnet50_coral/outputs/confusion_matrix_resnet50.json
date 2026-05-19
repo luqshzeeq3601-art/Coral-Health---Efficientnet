@@ -1,0 +1,64 @@
+{
+    "model": "ResNet50 Robust Single Model",
+    "seed": 42,
+    "protocol": "224px single-scale, no TTA",
+    "accuracy": 0.9811320754716981,
+    "accuracy_percent": 98.11,
+    "test_samples": 159,
+    "total_errors": 3,
+    "class_order": [
+        "Healthy",
+        "Bleached",
+        "Dead"
+    ],
+    "confusion_matrix": [
+        [
+            72,
+            0,
+            0
+        ],
+        [
+            0,
+            71,
+            1
+        ],
+        [
+            0,
+            2,
+            13
+        ]
+    ],
+    "classification_report": {
+        "Healthy": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 72.0
+        },
+        "Bleached": {
+            "precision": 0.9726027397260274,
+            "recall": 0.9861111111111112,
+            "f1-score": 0.9793103448275862,
+            "support": 72.0
+        },
+        "Dead": {
+            "precision": 0.9285714285714286,
+            "recall": 0.8666666666666667,
+            "f1-score": 0.896551724137931,
+            "support": 15.0
+        },
+        "accuracy": 0.9811320754716981,
+        "macro avg": {
+            "precision": 0.9670580560991521,
+            "recall": 0.950925925925926,
+            "f1-score": 0.9586206896551724,
+            "support": 159.0
+        },
+        "weighted avg": {
+            "precision": 0.980855148986449,
+            "recall": 0.9811320754716981,
+            "f1-score": 0.980871828236825,
+            "support": 159.0
+        }
+    }
+}

@@ -1,0 +1,62 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Model weights (too large for GitHub)
+*.h5
+*.weights.h5
+*.tflite
+*.onnx
+*.pb
+*.pth
+*.pt
+*.pkl
+*.joblib
+
+# Datasets & archives
+*.rar
+*.zip
+*.tar
+*.tar.gz
+Dataset/
+
+# Large output images
+02_Modelling/*/outputs/*.png
+02_Modelling/*/outputs/*.jpg
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.bak
+.tmp.driveupload/
+
+# Environment variables (may contain secrets)
+.env
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Pyre (type checker)
+.pyre_configuration
+.pyre/

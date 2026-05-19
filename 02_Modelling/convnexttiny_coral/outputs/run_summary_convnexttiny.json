@@ -1,0 +1,29 @@
+{
+    "model": "ConvNeXtTiny Robust Single Model",
+    "seed": 42,
+    "img_size": 224,
+    "epochs": 30,
+    "batch_size": 6,
+    "label_smoothing": 0.05,
+    "initial_lr": 5e-05,
+    "swa_start_epoch": 25,
+    "total_params": 27822435,
+    "trainable_params": 14293251,
+    "class_weights": {
+        "0": 1.1573288058856819,
+        "1": 0.657979407979408,
+        "2": 2.109920634920635
+    },
+    "split_info_path": "C:\\Users\\ZeeqRyz\\Desktop\\BASEPROJECT\\05_Baseline_Model\\split_info_v3.json",
+    "dataset_path": "C:\\Users\\ZeeqRyz\\Desktop\\BASEPROJECT\\Dataset",
+    "include_preprocessing": true,
+    "input_value_range": "raw RGB 0-255",
+    "trainable_backbone_scope": "convnext_tiny_stage_3 plus final layer_normalization",
+    "gpu_temperature_limit_c": 78,
+    "gpu_resume_temperature_c": 68,
+    "gpu_cooldown_seconds": 45,
+    "gpu_batch_check_interval": 10,
+    "final_accuracy": 0.9748427672955975,
+    "final_accuracy_percent": 97.48,
+    "total_errors": 4
+}

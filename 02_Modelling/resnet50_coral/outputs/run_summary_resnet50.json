@@ -1,0 +1,24 @@
+{
+    "model": "ResNet50 Robust Single Model",
+    "seed": 42,
+    "img_size": 224,
+    "epochs": 30,
+    "batch_size": 8,
+    "label_smoothing": 0.05,
+    "initial_lr": 8e-05,
+    "swa_start_epoch": 25,
+    "total_params": 23593859,
+    "trainable_params": 16956675,
+    "class_weights": {
+        "0": 1.1573288058856819,
+        "1": 0.657979407979408,
+        "2": 2.109920634920635
+    },
+    "split_info_path": "C:\\Users\\ZeeqRyz\\Desktop\\BASEPROJECT\\05_Baseline_Model\\split_info_v3.json",
+    "dataset_path": "C:\\Users\\ZeeqRyz\\Desktop\\BASEPROJECT\\Dataset",
+    "gpu_temperature_limit_c": 80,
+    "gpu_resume_temperature_c": 70,
+    "final_accuracy": 0.9811320754716981,
+    "final_accuracy_percent": 98.11,
+    "total_errors": 3
+}

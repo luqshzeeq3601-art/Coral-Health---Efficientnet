@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Comparison — Coral Reef CNN Analysis</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <style>
+    /* ── CSS Variables ──────────────────────────────── */
+    :root {
+      --bg:            #070E1C;
+      --bg-surface:    #0D1A2E;
+      --bg-card:       rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.07);
+      --text-primary:  #E6F2F8;
+      --text-secondary:#7A9BB8;
+      --text-muted:    #3E5E7A;
+      --border:        rgba(100,180,220,0.10);
+      --border-accent: rgba(29,158,117,0.30);
+      --accent:        #1EBFAC;
+      --accent-dim:    rgba(30,191,172,0.10);
+      --shadow:        rgba(0,0,0,0.55);
+      --chart-grid:    rgba(255,255,255,0.06);
+
+      --c-efficient:   #1D9E75;
+      --c-resnet:      #378ADD;
+      --c-convnext:    #D85A30;
+    }
+
+    [data-theme="light"] {
+      --bg:            #EEF4F9;
+      --bg-surface:    #FFFFFF;
+      --bg-card:       rgba(255,255,255,0.72);
+      --bg-card-hover: rgba(255,255,255,0.92);
+      --text-primary:  #0D1A2E;
+      --text-secondary:#3A5C78;
+      --text-muted:    #7A98B0;
+      --border:        rgba(0,80,120,0.10);
+      --border-accent: rgba(10,143,128,0.35);
+      --accent:        #0A8F80;
+      --accent-dim:    rgba(10,143,128,0.08);
+      --shadow:        rgba(0,40,80,0.14);
+      --chart-grid:    rgba(0,0,0,0.06);
+    }
+
+    /* ── Reset ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 3rem 1.5rem 4rem;
+      position: relative;
+      overflow-x: hidden;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    /* Ambient ocean glow */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 8%,  rgba(30,191,172,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 50% at 85% 85%, rgba(55,138,221,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 40% at 50% 45%, rgba(29,158,117,0.03) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+      animation: ambientShift 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientShift {
+      from { opacity: 0.8; transform: scale(1); }
+      to   { opacity: 1;   transform: scale(1.04); }
+    }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .section {
+      max-width: 980px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .title-block { display: flex; flex-direction: column; gap: 0.45rem; }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.67rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.9;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      line-height: 1.05;
+    }
+
+    .section-title em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.42rem 1rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+      margin-top: 0.5rem;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      border-color: var(--border-accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ── Metric Cards ───────────────────────────────── */
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--c-efficient);
+      border-radius: 14px;
+      padding: 1.35rem 1.1rem 1.1rem;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      animation: slideUp 0.55s ease both;
+    }
+
+    .metric-card:nth-child(1) { animation-delay: 0.08s; }
+    .metric-card:nth-child(2) { animation-delay: 0.16s; }
+    .metric-card:nth-child(3) { animation-delay: 0.24s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% -10%, rgba(29,158,117,0.10) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px var(--shadow), 0 0 0 1px var(--border-accent);
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .metric-value sup {
+      font-size: 0.85rem;
+      font-weight: 400;
+      vertical-align: super;
+      letter-spacing: 0;
+    }
+
+    .metric-sub {
+      font-size: 0.67rem;
+      color: var(--c-efficient);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Chart Panel ────────────────────────────────── */
+    .chart-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.5rem 1.5rem 1.25rem;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      animation: slideUp 0.55s 0.32s ease both;
+    }
+
+    .chart-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .chart-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── Custom Legend ──────────────────────────────── */
+    .legend {
+      display: flex;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.48rem;
+    }
+
+    .legend-icon {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+    .legend-icon svg { width: 100%; height: 100%; display: block; }
+
+    .legend-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .legend-item.champion .legend-name {
+      color: var(--c-efficient);
+      font-weight: 500;
+    }
+
+    .best-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.54rem;
+      background: rgba(29,158,117,0.14);
+      color: var(--c-efficient);
+      border: 1px solid rgba(29,158,117,0.28);
+      border-radius: 3px;
+      padding: 0.12em 0.45em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Chart Canvas ───────────────────────────────── */
+    .chart-wrapper {
+      position: relative;
+      height: 300px;
+    }
+
+    /* ── Tooltip ────────────────────────────────────── */
+    #chartTooltip {
+      position: fixed;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      padding: 0.8rem 1.05rem;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(5px) scale(0.97);
+      transition: opacity 0.14s ease, transform 0.14s ease;
+      box-shadow: 0 10px 30px var(--shadow);
+      min-width: 190px;
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    #chartTooltip.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .tt-model-name {
+      font-family: 'Fraunces', serif;
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.18rem;
+    }
+    .tt-row:last-child { margin-bottom: 0; }
+
+    .tt-key {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+
+    .tt-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.73rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ── Table ──────────────────────────────────────── */
+    .table-section { animation: slideUp 0.55s 0.42s ease both; }
+
+    .subsection-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.67rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    thead th {
+      padding: 0.7rem 1.1rem;
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    thead th:not(:first-child):not(:nth-child(2)) { text-align: right; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.18s ease;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg-card-hover); }
+
+    tbody td {
+      padding: 0.9rem 1.1rem;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    td.data-cell {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-align: right;
+    }
+
+    td.type-cell {
+      font-size: 0.73rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .model-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .model-pip {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .champ-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.53rem;
+      background: rgba(29,158,117,0.14);
+      color: var(--c-efficient);
+      border: 1px solid rgba(29,158,117,0.28);
+      border-radius: 3px;
+      padding: 0.12em 0.45em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 0.25rem;
+    }
+
+    .champion-row td:first-child .model-cell span:nth-child(2) {
+      font-weight: 500;
+    }
+
+    /* ── Findings ───────────────────────────────────── */
+    .findings-section { animation: slideUp 0.55s 0.52s ease both; }
+
+    .findings-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .finding {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 2.5px solid var(--c-efficient);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .finding-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      color: var(--c-efficient);
+      opacity: 0.65;
+      flex-shrink: 0;
+      margin-top: 0.12rem;
+      letter-spacing: 0.04em;
+    }
+
+    .finding-text {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .finding-text strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 640px) {
+      body { padding: 2rem 1rem 3rem; }
+      .section-header { flex-direction: column; }
+      .metric-row { grid-template-columns: 1fr; }
+      .chart-top { flex-direction: column; align-items: flex-start; }
+      .legend { gap: 0.8rem; }
+      thead th:nth-child(2),
+      tbody td:nth-child(2) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<section class="section" aria-labelledby="section-title">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="section-header">
+    <div class="title-block">
+      <span class="section-label">§ 4.3 — Model Evaluation</span>
+      <h2 class="section-title" id="section-title">Architecture <em>Comparison</em></h2>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle colour mode">◐ Light mode</button>
+  </header>
+
+  <!-- ── Metric Cards ─────────────────────────────────── -->
+  <div class="metric-row" role="list" aria-label="Key performance metrics">
+    <div class="metric-card" role="listitem">
+      <div class="metric-label">Best Accuracy</div>
+      <div class="metric-value">98.11<sup>%</sup></div>
+      <div class="metric-sub">EfficientNetB0 Ensemble</div>
+    </div>
+    <div class="metric-card" role="listitem">
+      <div class="metric-label">Fewest Parameters</div>
+      <div class="metric-value">20.3<sup>M</sup></div>
+      <div class="metric-sub">EfficientNetB0 Ensemble</div>
+    </div>
+    <div class="metric-card" role="listitem">
+      <div class="metric-label">Best Macro F1</div>
+      <div class="metric-value">0.98</div>
+      <div class="metric-sub">EfficientNetB0 Ensemble</div>
+    </div>
+  </div>
+
+  <!-- ── Chart Panel ──────────────────────────────────── -->
+  <div class="chart-panel">
+    <div class="chart-top">
+      <span class="chart-eyebrow">Test Accuracy vs. Parameter Count</span>
+      <div class="legend" role="list" aria-label="Model legend">
+        <div class="legend-item champion" role="listitem">
+          <div class="legend-icon">
+            <svg viewBox="0 0 15 15" aria-hidden="true">
+              <circle cx="7.5" cy="7.5" r="6" fill="#1D9E75"/>
+              <circle cx="7.5" cy="7.5" r="6" fill="none" stroke="#1D9E75" stroke-opacity="0.4" stroke-width="3" r="8.5"/>
+            </svg>
+          </div>
+          <span class="legend-name">EfficientNetB0 Ensemble</span>
+          <span class="best-badge">★ Best</span>
+        </div>
+        <div class="legend-item" role="listitem">
+          <div class="legend-icon">
+            <svg viewBox="0 0 15 15" aria-hidden="true">
+              <rect x="1.5" y="1.5" width="12" height="12" rx="2" fill="#378ADD"/>
+            </svg>
+          </div>
+          <span class="legend-name">ResNet50 Single</span>
+        </div>
+        <div class="legend-item" role="listitem">
+          <div class="legend-icon">
+            <svg viewBox="0 0 15 15" aria-hidden="true">
+              <polygon points="7.5,1 14,13.5 1,13.5" fill="#D85A30"/>
+            </svg>
+          </div>
+          <span class="legend-name">ConvNeXtTiny Single</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-wrapper">
+      <canvas id="archChart" role="img"
+        aria-label="Scatter chart: Test Accuracy (%) vs Parameters (M) for three CNN architectures. EfficientNetB0 Ensemble: 20.3M params, 98.11% accuracy. ResNet50 Single: 23.6M params, 98.11% accuracy. ConvNeXtTiny Single: 27.8M params, 97.48% accuracy.">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- ── Custom Tooltip ───────────────────────────────── -->
+  <div id="chartTooltip" role="tooltip" aria-live="polite">
+    <div class="tt-model-name" id="ttName">—</div>
+    <div class="tt-row">
+      <span class="tt-key">Parameters</span>
+      <span class="tt-val" id="ttParams">—</span>
+    </div>
+    <div class="tt-row">
+      <span class="tt-key">Accuracy</span>
+      <span class="tt-val" id="ttAcc">—</span>
+    </div>
+    <div class="tt-row">
+      <span class="tt-key">Macro F1</span>
+      <span class="tt-val" id="ttF1">—</span>
+    </div>
+    <div class="tt-row">
+      <span class="tt-key">Errors</span>
+      <span class="tt-val" id="ttErr">—</span>
+    </div>
+  </div>
+
+  <!-- ── Summary Table ────────────────────────────────── -->
+  <div class="table-section">
+    <div class="subsection-label">Summary — All Architectures</div>
+    <div class="table-wrap">
+      <table aria-label="CNN architecture comparison summary">
+        <thead>
+          <tr>
+            <th scope="col">Model</th>
+            <th scope="col">Type</th>
+            <th scope="col">Params (M)</th>
+            <th scope="col">Accuracy (%)</th>
+            <th scope="col">Macro F1</th>
+            <th scope="col">Errors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="champion-row">
+            <td>
+              <div class="model-cell">
+                <span class="model-pip" style="background:#1D9E75; box-shadow:0 0 7px rgba(29,158,117,0.55)"></span>
+                <span>EfficientNetB0 Ensemble</span>
+                <span class="champ-label">★ Best</span>
+              </div>
+            </td>
+            <td class="type-cell">5-seed SWA ensemble</td>
+            <td class="data-cell">20.3</td>
+            <td class="data-cell">98.11</td>
+            <td class="data-cell">0.98</td>
+            <td class="data-cell">3</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="model-cell">
+                <span class="model-pip" style="background:#378ADD"></span>
+                <span>ResNet50 Single</span>
+              </div>
+            </td>
+            <td class="type-cell">Single robust SWA model</td>
+            <td class="data-cell">23.6</td>
+            <td class="data-cell">98.11</td>
+            <td class="data-cell">0.96</td>
+            <td class="data-cell">3</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="model-cell">
+                <span class="model-pip" style="background:#D85A30"></span>
+                <span>ConvNeXtTiny Single</span>
+              </div>
+            </td>
+            <td class="type-cell">Single robust SWA model</td>
+            <td class="data-cell">27.8</td>
+            <td class="data-cell">97.48</td>
+            <td class="data-cell">0.97</td>
+            <td class="data-cell">4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Key Findings ──────────────────────────────────── -->
+  <div class="findings-section">
+    <div class="subsection-label">Key Findings</div>
+    <ul class="findings-list" aria-label="Key findings">
+      <li class="finding">
+        <span class="finding-idx">01</span>
+        <p class="finding-text">
+          <strong>EfficientNetB0 Ensemble</strong> achieves the highest macro F1 (0.98) with the fewest parameters (20.3M),
+          demonstrating superior parameter efficiency.
+        </p>
+      </li>
+      <li class="finding">
+        <span class="finding-idx">02</span>
+        <p class="finding-text">
+          <strong>ResNet50 Single</strong> matches EfficientNetB0's accuracy (98.11%) but requires 16% more parameters
+          and yields a lower macro F1 (0.96).
+        </p>
+      </li>
+      <li class="finding">
+        <span class="finding-idx">03</span>
+        <p class="finding-text">
+          <strong>ConvNeXtTiny Single</strong> uses the most parameters (27.8M) yet achieves the lowest accuracy (97.48%),
+          indicating diminishing returns at higher model complexity for this dataset.
+        </p>
+      </li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ── Tooltip DOM refs ─────────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+
+  /* ── Theme Toggle ──────────────────────────────────────── */
+  const html        = document.documentElement;
+  const themeBtn    = document.getElementById('themeToggle');
+
+  themeBtn.addEventListener('click', () => {
+    const dark = html.dataset.theme === 'dark';
+    html.dataset.theme = dark ? 'light' : 'dark';
+    themeBtn.textContent = dark ? '◐ Dark mode' : '◐ Light mode';
+    applyChartTheme();
+  });
+
+  /* ── Model Data ────────────────────────────────────────── */
+  const MODELS = [
+    { name: 'EfficientNetB0 Ensemble', x: 20.3, y: 98.11, f1: 0.98, errors: 3, color: '#1D9E75', shape: 'circle',   champion: true  },
+    { name: 'ResNet50 Single',         x: 23.6, y: 98.11, f1: 0.96, errors: 3, color: '#378ADD', shape: 'square',   champion: false },
+    { name: 'ConvNeXtTiny Single',     x: 27.8, y: 97.48, f1: 0.97, errors: 4, color: '#D85A30', shape: 'triangle', champion: false },
+  ];
+
+  /* ── Custom Markers Plugin ─────────────────────────────── */
+  function drawMarker(ctx, shape, px, py, size, color, isChampion) {
+    ctx.save();
+    ctx.fillStyle   = color;
+    ctx.strokeStyle = isChampion ? 'rgba(255,255,255,0.85)' : color;
+    ctx.lineWidth   = isChampion ? 2.5 : 1.5;
+
+    /* Champion glow ring */
+    if (isChampion) {
+      ctx.beginPath();
+      ctx.arc(px, py, size + 7, 0, Math.PI * 2);
+      ctx.strokeStyle = color + '3A';
+      ctx.lineWidth   = 4;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(px, py, size + 3.5, 0, Math.PI * 2);
+      ctx.strokeStyle = color + '60';
+      ctx.lineWidth   = 1.5;
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth   = 2.5;
+    }
+
+    if (shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(px, py, size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    } else if (shape === 'square') {
+      const s = size * 1.65;
+      ctx.beginPath();
+      ctx.roundRect(px - s / 2, py - s / 2, s, s, 2.5);
+      ctx.fill();
+      ctx.stroke();
+    } else if (shape === 'triangle') {
+      const h = size * 1.85;
+      ctx.beginPath();
+      ctx.moveTo(px,           py - h);
+      ctx.lineTo(px + h * 0.9, py + h * 0.6);
+      ctx.lineTo(px - h * 0.9, py + h * 0.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  const customMarkersPlugin = {
+    id: 'customMarkers',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      chart.data.datasets.forEach((ds, di) => {
+        const meta  = chart.getDatasetMeta(di);
+        const model = MODELS[di];
+        meta.data.forEach(pt => {
+          drawMarker(ctx, model.shape, pt.x, pt.y,
+            model.champion ? 9 : 7,
+            model.color,
+            model.champion
+          );
+        });
+      });
+    },
+  };
+
+  /* ── Theme-aware axis colours ──────────────────────────── */
+  function themeColors() {
+    const dark = html.dataset.theme === 'dark';
+    return {
+      grid:   dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      tick:   dark ? '#3E5E7A'                : '#7A98B0',
+      border: dark ? 'rgba(100,180,220,0.10)' : 'rgba(0,80,120,0.08)',
+    };
+  }
+
+  function buildScaleOptions() {
+    const { grid, tick, border } = themeColors();
+    const shared = {
+      grid:   { color: grid },
+      border: { color: border },
+      ticks:  { color: tick, font: { family: "'JetBrains Mono', monospace", size: 10 } },
+      title:  { display: true, color: tick, font: { family: "'DM Sans', sans-serif", size: 11 } },
+    };
+    return {
+      x: {
+        ...shared,
+        type: 'linear', min: 18, max: 30,
+        title: { ...shared.title, text: 'Number of parameters (millions)', padding: { top: 8 } },
+        ticks: { ...shared.ticks, stepSize: 2, callback: v => v + 'M' },
+      },
+      y: {
+        ...shared,
+        min: 97.0, max: 98.5,
+        title: { ...shared.title, text: 'Test accuracy (%)', padding: { right: 8 } },
+        ticks: { ...shared.ticks, stepSize: 0.3, callback: v => v.toFixed(1) + '%' },
+      },
+    };
+  }
+
+  /* ── Chart Init ────────────────────────────────────────── */
+  const canvasEl = document.getElementById('archChart');
+  const ctx2d    = canvasEl.getContext('2d');
+
+  const chart = new Chart(ctx2d, {
+    type: 'scatter',
+    plugins: [customMarkersPlugin],
+    data: {
+      datasets: MODELS.map(m => ({
+        label:            m.name,
+        data:             [{ x: m.x, y: m.y }],
+        backgroundColor:  m.color,
+        borderColor:      m.color,
+        pointRadius:      0,
+        pointHoverRadius: 0,
+        hitRadius:        20,
+      })),
+    },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      animation:           { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend:  { display: false },
+        tooltip: { enabled: false },
+      },
+      scales: buildScaleOptions(),
+    },
+  });
+
+  function applyChartTheme() {
+    const scales = buildScaleOptions();
+    Object.entries(scales).forEach(([axis, cfg]) => {
+      Object.assign(chart.options.scales[axis].grid,   cfg.grid);
+      Object.assign(chart.options.scales[axis].border, cfg.border);
+      Object.assign(chart.options.scales[axis].ticks,  cfg.ticks);
+      Object.assign(chart.options.scales[axis].title,  cfg.title);
+    });
+    chart.update('none');
+  }
+
+  /* ── Custom Tooltip ────────────────────────────────────── */
+  const tooltip = document.getElementById('chartTooltip');
+  const ttName  = document.getElementById('ttName');
+  const ttParams = document.getElementById('ttParams');
+  const ttAcc   = document.getElementById('ttAcc');
+  const ttF1    = document.getElementById('ttF1');
+  const ttErr   = document.getElementById('ttErr');
+
+  const HIT_RADIUS = 24;
+
+  canvasEl.addEventListener('mousemove', e => {
+    const rect = canvasEl.getBoundingClientRect();
+    const mx   = e.clientX - rect.left;
+    const my   = e.clientY - rect.top;
+
+    let closest  = null;
+    let minDist  = Infinity;
+
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach(pt => {
+        const d = Math.hypot(mx - pt.x, my - pt.y);
+        if (d < HIT_RADIUS && d < minDist) {
+          minDist  = d;
+          closest  = MODELS[di];
+        }
+      });
+    });
+
+    if (closest) {
+      ttName.textContent   = closest.name;
+      ttName.style.color   = closest.color;
+      ttParams.textContent = closest.x + 'M';
+      ttAcc.textContent    = closest.y.toFixed(2) + '%';
+      ttF1.textContent     = closest.f1;
+      ttErr.textContent    = closest.errors;
+
+      const TW   = 200;
+      const left = (e.clientX + 18 + TW > window.innerWidth)
+                   ? e.clientX - TW - 14
+                   : e.clientX + 18;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top  = (e.clientY - 12) + 'px';
+      tooltip.classList.add('visible');
+      canvasEl.style.cursor = 'crosshair';
+    } else {
+      tooltip.classList.remove('visible');
+      canvasEl.style.cursor = 'default';
+    }
+  });
+
+  canvasEl.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+
+})();
+</script>
+</body>
+</html>

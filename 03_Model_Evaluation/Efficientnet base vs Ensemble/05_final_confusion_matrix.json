@@ -1,0 +1,33 @@
+{
+  "model": "Final Model",
+  "architecture": "EfficientNetB0",
+  "input_size": "224 x 224",
+  "accuracy": 0.9811320754716981,
+  "accuracy_percent": 98.11,
+  "test_samples": 159,
+  "total_errors": 3,
+  "class_order": [
+    "Healthy",
+    "Bleached",
+    "Dead"
+  ],
+  "confusion_matrix": [
+    [
+      72,
+      0,
+      0
+    ],
+    [
+      2,
+      70,
+      0
+    ],
+    [
+      0,
+      1,
+      14
+    ]
+  ],
+  "source_file": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\confusion_matrix_ensemble.json",
+  "source_protocol": "224px canonical benchmark, 5-seed SWA ensemble, single-scale, no TTA"
+}

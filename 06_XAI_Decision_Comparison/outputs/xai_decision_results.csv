@@ -1,0 +1,7 @@
+rank,case_type,image,true_label,baseline_prediction,baseline_confidence_percent,baseline_correct,current_prediction,current_confidence_percent,current_correct,baseline_gradcam_max,current_gradcam_max,panel_file
+1,healthy_representative_correct,Healthy/93.png,Healthy,Healthy,96.1499,True,Healthy,92.3158,True,1.000000,1.000000,panels/01_healthy_representative_correct_Healthy_93.png
+2,bleached_representative_correct,Bleached/104.png,Bleached,Bleached,98.1110,True,Bleached,99.3844,True,1.000000,1.000000,panels/02_bleached_representative_correct_Bleached_104.png
+3,dead_representative_correct,Dead/29.png,Dead,Dead,70.3073,True,Dead,99.3914,True,1.000000,1.000000,panels/03_dead_representative_correct_Dead_29.png
+4,baseline_wrong_current_correct,Dead/82.png,Dead,Bleached,53.1378,False,Dead,97.7229,True,1.000000,1.000000,panels/04_baseline_wrong_current_correct_Dead_82.png
+5,current_uncertain,Bleached/708.png,Bleached,Dead,54.5122,False,Bleached,42.1232,True,1.000000,1.000000,panels/05_current_uncertain_Bleached_708.png
+6,current_wrong,Bleached/492.png,Bleached,Healthy,67.7307,False,Healthy,54.2535,False,1.000000,1.000000,panels/06_current_wrong_Bleached_492.png

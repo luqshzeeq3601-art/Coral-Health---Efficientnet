@@ -1,0 +1,9 @@
+metric,value
+Model,Final Model
+Architecture,EfficientNetB0
+Input size,224 x 224
+Test samples,159
+Final test accuracy,98.11%
+Total errors,3
+Mean inference time,10.38 ms/image
+Estimated test-set time,1.65 s

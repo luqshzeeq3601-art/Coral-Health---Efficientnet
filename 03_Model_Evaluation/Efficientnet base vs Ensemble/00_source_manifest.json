@@ -1,0 +1,35 @@
+{
+  "canonical_benchmark": {
+    "model_name": "Final Model",
+    "architecture": "EfficientNetB0",
+    "input_size": "224 x 224",
+    "final_test_accuracy": 0.9811320754716981,
+    "final_test_accuracy_percent": 98.11,
+    "test_samples": 159,
+    "total_errors": 3,
+    "class_order": [
+      "Healthy",
+      "Bleached",
+      "Dead"
+    ]
+  },
+  "source_files": {
+    "training_history": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\training_history_ensemble.json",
+    "confusion_matrix": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\confusion_matrix_ensemble.json",
+    "baseline_summary": "05_Baseline_Model\\outputs\\baseline_model\\eval_summary.json",
+    "comparison_summary": "05_Baseline_Model\\outputs\\comparison\\comparison_summary.txt",
+    "gradcam_correct_examples": {
+      "Healthy": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\gradcam_all\\Healthy\\CORRECT_93_conf96.png",
+      "Bleached": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\gradcam_all\\Bleached\\CORRECT_104_conf99.png",
+      "Dead": "03_Model_Evaluation\\01_EfficientNetB0_Evaluation\\gradcam_all\\Dead\\CORRECT_29_conf99.png"
+    },
+    "wrong_prediction_panel": "06_XAI_Decision_Comparison\\outputs\\panels\\06_current_wrong_Bleached_492.png",
+    "xai_results": "06_XAI_Decision_Comparison\\outputs\\xai_decision_results.csv"
+  },
+  "generation_notes": [
+    "No model training was performed.",
+    "No model weights were changed.",
+    "No prediction values were modified.",
+    "Legacy model labels were normalized to Final Model and Baseline Model in generated figures."
+  ]
+}

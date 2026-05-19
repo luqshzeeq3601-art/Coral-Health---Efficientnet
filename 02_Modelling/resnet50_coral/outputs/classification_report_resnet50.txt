@@ -1,0 +1,13 @@
+ResNet50 Robust Single Model - Seed 42 SWA
+Protocol: 224px single-scale, no TTA
+Accuracy: 98.11%
+
+              precision    recall  f1-score   support
+
+     Healthy       1.00      1.00      1.00        72
+    Bleached       0.97      0.99      0.98        72
+        Dead       0.93      0.87      0.90        15
+
+    accuracy                           0.98       159
+   macro avg       0.97      0.95      0.96       159
+weighted avg       0.98      0.98      0.98       159

@@ -1,0 +1,7 @@
+metric,baseline_model,final_model
+Architecture,EfficientNetB0,EfficientNetB0
+Input size,224 x 224,224 x 224
+Test accuracy,84.91%,98.11%
+Macro F1-score,79.19%,97.69%
+Total errors,24,3
+Inference time,1.81 ms/image,10.38 ms/image

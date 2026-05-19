@@ -1,0 +1,13 @@
+ConvNeXtTiny Robust Single Model - Seed 42 SWA
+Protocol: 224px single-scale, no TTA
+Accuracy: 97.48%
+
+              precision    recall  f1-score   support
+
+     Healthy       0.96      0.99      0.97        72
+    Bleached       0.99      0.97      0.98        72
+        Dead       1.00      0.93      0.97        15
+
+    accuracy                           0.97       159
+   macro avg       0.98      0.96      0.97       159
+weighted avg       0.98      0.97      0.97       159
