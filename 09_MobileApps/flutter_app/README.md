@@ -1,4 +1,4 @@
-# flutter_app
+# coral_ai
 
 A new Flutter project.
 

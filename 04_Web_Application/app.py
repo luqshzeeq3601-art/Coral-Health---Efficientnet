@@ -1328,6 +1328,252 @@ def predict():
         return jsonify(result)
 
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================================
+# Grad-CAM 3D Simulation & Real Activation Extraction (Subagent 1)
+# ============================================================
+
+def compute_simulation_gradcam_and_activations(model, img_array, class_idx):
+    """
+    Extract intermediate layer activations of the top-6 highest-activated conv channels
+    and calculate their actual pooled gradient importance weights (alpha_k).
+    """
+    efficientnet = None
+    for layer in model.layers:
+        if 'efficientnet' in layer.name.lower():
+            efficientnet = layer
+            break
+            
+    if efficientnet is None:
+        return None
+        
+    try:
+        target_layer = efficientnet.get_layer('top_conv')
+    except Exception:
+        # Fallback to last Conv2D if top_conv is not found
+        for layer in reversed(efficientnet.layers):
+            if isinstance(layer, tf.keras.layers.Conv2D):
+                target_layer = layer
+                break
+                
+    if target_layer is None:
+        return None
+
+    # Step A: Build a model to get the target conv activations
+    grad_model_part1 = tf.keras.models.Model(
+        inputs=efficientnet.input,
+        outputs=target_layer.output
+    )
+    
+    try:
+        top_bn = efficientnet.get_layer('top_bn')
+        top_activation = efficientnet.get_layer('top_activation')
+        has_top_layers = True
+    except Exception:
+        has_top_layers = False
+
+    img_batch = tf.cast(np.expand_dims(img_array, axis=0), tf.float32)
+    conv_outputs_value = grad_model_part1(img_batch)
+    conv_outputs = tf.Variable(conv_outputs_value, trainable=True, dtype=tf.float32)
+    
+    eff_index = -1
+    for i, layer in enumerate(model.layers):
+        if layer == efficientnet:
+            eff_index = i
+            break
+            
+    with tf.GradientTape() as tape:
+        x = conv_outputs
+        if has_top_layers:
+            x = top_bn(x, training=False)
+            x = top_activation(x)
+        if eff_index != -1:
+            for layer in model.layers[eff_index + 1:]:
+                try:
+                    x = layer(x, training=False)
+                except TypeError:
+                    x = layer(x)
+        model_outputs = x
+        loss = model_outputs[:, class_idx]
+        
+    grads = tape.gradient(loss, conv_outputs)
+    if grads is None:
+        return None
+        
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2)).numpy()
+    conv_out = conv_outputs[0].numpy()  # (7, 7, 1280)
+    
+    # Calculate channel mean activations to pick the top 6 highest-activated channels
+    mean_activations = np.mean(conv_out, axis=(0, 1))  # (1280,)
+    top_6_indices = np.argsort(mean_activations)[::-1][:6].tolist()
+    
+    channels_data = []
+    for rank, idx in enumerate(top_6_indices):
+        fmap = conv_out[:, :, idx]
+        # Normalize between [0, 1]
+        fmap_min, fmap_max = np.min(fmap), np.max(fmap)
+        if fmap_max > fmap_min:
+            fmap_norm = (fmap - fmap_min) / (fmap_max - fmap_min)
+        else:
+            fmap_norm = np.zeros_like(fmap)
+            
+        # Resize activation map up to 224x224 input space
+        fmap_resized = cv2.resize(fmap_norm, (224, 224), interpolation=cv2.INTER_LINEAR)
+        fmap_uint8 = np.uint8(fmap_resized * 255)
+        
+        _, buffer = cv2.imencode('.png', fmap_uint8)
+        fmap_b64 = base64.b64encode(buffer).decode('utf-8')
+        
+        channels_data.append({
+            'channel_index': idx,
+            'rank': rank + 1,
+            'activation_mean': float(mean_activations[idx]),
+            'alpha_k': float(pooled_grads[idx]),
+            'texture_base64': fmap_b64
+        })
+        
+    # Build complete Grad-CAM heatmap
+    heatmap = conv_out @ pooled_grads[..., np.newaxis]
+    heatmap = np.squeeze(heatmap)
+    heatmap = np.maximum(heatmap, 0)
+    
+    if np.max(heatmap) > 0:
+        heatmap = heatmap / np.max(heatmap)
+        
+    heatmap_resized = cv2.resize(heatmap, (224, 224), interpolation=cv2.INTER_LINEAR)
+    heatmap_b64 = heatmap_to_base64(heatmap_resized)
+    
+    # Create overlay
+    overlay = create_overlay(img_array, heatmap_resized)
+    overlay_b64 = numpy_to_base64(overlay)
+    
+    return {
+        'channels': channels_data,
+        'heatmap_base64': heatmap_b64,
+        'overlay_base64': overlay_b64
+    }
+
+@app.route('/api/simulation_samples', methods=['GET'])
+def get_simulation_samples():
+    """Serve 6 canonical tested dataset samples (2 Healthy, 2 Bleached, 2 Dead) with thumbnails."""
+    dataset_dir = os.path.normpath(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        '..', 'Dataset'
+    ))
+    
+    classes = ['Healthy', 'Bleached', 'Dead']
+    samples = []
+    
+    for cls in classes:
+        cls_dir = os.path.join(dataset_dir, cls)
+        if not os.path.exists(cls_dir):
+            continue
+            
+        # Get valid images
+        files = sorted([f for f in os.listdir(cls_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+        
+        for i, filename in enumerate(files[:2]):
+            rel_path = f"Dataset/{cls}/{filename}"
+            full_path = os.path.join(cls_dir, filename)
+            
+            thumb_b64 = None
+            try:
+                with Image.open(full_path) as img:
+                    img.thumbnail((120, 120))
+                    buffered = io.BytesIO()
+                    img.save(buffered, format="PNG")
+                    thumb_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            except Exception as e:
+                print(f"Error encoding thumbnail for {filename}: {e}")
+                
+            samples.append({
+                'id': f"{cls.lower()}_sample_{i+1}",
+                'path': rel_path,
+                'class': cls,
+                'name': f"{cls} Coral Sample #{i+1}",
+                'filename': filename,
+                'thumbnail_b64': thumb_b64
+            })
+            
+    return jsonify({'samples': samples})
+
+@app.route('/api/simulation_inference', methods=['POST'])
+def run_simulation_inference():
+    """Run real model inference on dataset image and extract activations + alpha weights."""
+    import time
+    data = request.get_json(silent=True) or {}
+    rel_path = data.get('path')
+    
+    if not rel_path:
+        return jsonify({'error': 'No image path provided'}), 400
+        
+    abs_path = os.path.normpath(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        '..', rel_path
+    ))
+    
+    # Security/Sanity Check
+    base_dataset = os.path.normpath(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        '..', 'Dataset'
+    ))
+    if not abs_path.startswith(base_dataset):
+        return jsonify({'error': 'Unauthorized path access'}), 403
+        
+    if not os.path.exists(abs_path):
+        return jsonify({'error': f'Sample image not found: {rel_path}'}), 404
+        
+    try:
+        img_bgr = cv2.imread(abs_path, cv2.IMREAD_COLOR)
+        if img_bgr is None:
+            return jsonify({'error': 'Could not decode sample image'}), 400
+            
+        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+        img_resized = cv2.resize(img_rgb, (IMG_SIZE, IMG_SIZE))
+        
+        # Select base model
+        model = BASE_MODEL
+        if model is None and len(MODELS) > 0:
+            model = MODELS[0]
+            
+        if model is None:
+            return jsonify({'error': 'Model not loaded on server'}), 500
+            
+        # Inference speed benchmarking
+        start_time = time.time()
+        preds = model.predict(np.expand_dims(img_resized.astype('float32'), axis=0), verbose=0)[0]
+        inference_time_ms = (time.time() - start_time) * 1000
+        
+        calibrated_preds = temperature_scale_from_probs(preds, TEMPERATURE)
+        pred_idx = int(np.argmax(calibrated_preds))
+        confidence = float(calibrated_preds[pred_idx] * 100)
+        prediction_label = CLASS_NAMES[pred_idx]
+        
+        # Extract activations + alpha values
+        explanation = compute_simulation_gradcam_and_activations(model, img_resized, pred_idx)
+        if explanation is None:
+            return jsonify({'error': 'Could not extract activations or Grad-CAM'}), 500
+            
+        # Original image base64
+        _, buffer = cv2.imencode('.png', img_bgr)
+        input_image_b64 = base64.b64encode(buffer).decode('utf-8')
+        
+        result = {
+            'path': rel_path,
+            'prediction': prediction_label,
+            'confidence': confidence,
+            'probabilities': {name: float(calibrated_preds[i] * 100) for i, name in enumerate(CLASS_NAMES)},
+            'inference_time_ms': inference_time_ms,
+            'input_image_b64': input_image_b64,
+            'heatmap_base64': explanation['heatmap_base64'],
+            'overlay_base64': explanation['overlay_base64'],
+            'channels': explanation['channels']
+        }
+        
+        return jsonify(result)
+        
+    except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500

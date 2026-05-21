@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_app"
+    namespace = "com.unimap.coralai.coral_ai"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.flutter_app"
+        applicationId = "com.unimap.coralai.coral_ai"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -41,4 +41,15 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// Auto-delete desktop.ini files that OneDrive injects into res folders
+tasks.whenTaskAdded {
+    if (name.startsWith("merge") && name.endsWith("Resources")) {
+        doFirst {
+            fileTree("src/main/res") {
+                include("**/desktop.ini")
+            }.forEach { it.delete() }
+        }
+    }
 }

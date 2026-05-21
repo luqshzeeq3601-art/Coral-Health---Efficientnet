@@ -1,6 +1,6 @@
 {
-    "name": "flutter_app",
-    "short_name": "flutter_app",
+    "name": "coral_ai",
+    "short_name": "coral_ai",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -30,17 +30,24 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <!-- Three.js, OrbitControls, and GSAP for 3D GradCAM Simulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
         
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #ffffff;
+            background-color: #f8faff;
             color: #111827;
         }
         .mesh-bg {
-            background: linear-gradient(120deg, #ffffff, #e0f7fa, #ffffff);
-            background-size: 200% 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(94,234,212,0.18), transparent 42%),
+                radial-gradient(circle at 80% 70%, rgba(96,165,250,0.14), transparent 45%),
+                linear-gradient(160deg, #f0fdfa, #e0f2fe, #f8faff, #d5f0ff);
+            background-size: 100% 100%, 100% 100%, 300% 300%;
             animation: meshGradient 15s ease infinite;
             position: absolute;
             inset: 0;
@@ -526,7 +533,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-24 bg-white border-t-2 border-slate-200" aria-labelledby="about-heading">
+    <section id="about" class="py-24 border-t-2 border-slate-200" style="background: linear-gradient(135deg, #fefdf8 0%, #f0fdfa 100%);" aria-labelledby="about-heading">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
           <div class="relative order-2 lg:order-1 flex justify-center transform transition-all duration-500 opacity-100">
@@ -553,7 +560,7 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-24 bg-[#f0fdf9] border-t-2 border-teal-100 relative" aria-labelledby="features-heading">
+    <section id="features" class="py-24 border-t-2 border-teal-100 relative" style="background-image: radial-gradient(ellipse 50% 30% at 20% 20%, rgba(20,184,166,0.10), transparent), radial-gradient(ellipse 40% 25% at 85% 80%, rgba(59,130,246,0.08), transparent), radial-gradient(ellipse 60% 40% at 50% 0%, rgba(20,184,166,0.08), transparent); background-color: #f0fdf9;" aria-labelledby="features-heading">
       <div class="max-w-7xl mx-auto px-6">
         <div class="text-center max-w-2xl mx-auto mb-16">
           <h2 class="text-sm font-semibold text-blue-600 tracking-wider uppercase mb-3">Technology</h2>
@@ -601,16 +608,11 @@
           </div>
         </div>
       </div>
-      <!-- Wave Transition -->
-      <div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10" style="transform: translateY(1px);">
-        <svg class="block w-full h-[50px] md:h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" fill="#0b1121"></path>
-        </svg>
-      </div>
+
     </section>
 
     <!-- Performance Section (Redesigned) -->
-    <section id="performance" class="pt-16 pb-24 bg-[#0b1121] text-white relative" aria-labelledby="performance-heading">
+    <section id="performance" class="pt-16 pb-24 bg-[#0b1121] text-white relative" style="background-image: radial-gradient(ellipse 80% 300px at 50% 180px, rgba(20,184,166,0.12), transparent), radial-gradient(ellipse 60% 40% at 90% 100%, rgba(59,130,246,0.10), transparent); background-color: #0b1121;" aria-labelledby="performance-heading">
       <div class="max-w-7xl mx-auto px-6">
         <div class="text-center max-w-2xl mx-auto mb-12">
           <div class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/25 rounded-full px-4 py-1.5 mb-4">
@@ -1026,7 +1028,7 @@
     </section>
 
     <!-- HOW GRADCAM WORKS -->
-    <section id="how-gradcam-works" class="py-24 bg-[#f8fffe] border-t-2 border-teal-100/70 relative flex items-center justify-center" aria-labelledby="gradcam-heading">
+    <section id="how-gradcam-works" class="py-24 border-t-2 border-teal-100/70 relative flex items-center justify-center" style="background-color: #f0fdf4; background-image: linear-gradient(rgba(20,184,166,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.05) 1px, transparent 1px); background-size: 40px 40px;" aria-labelledby="gradcam-heading">
       <style>
         #how-gradcam-works .gc-scrollbar-hide::-webkit-scrollbar { display: none; }
         #how-gradcam-works .gc-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1046,6 +1048,14 @@
           animation: gc-arrow-slide 2.5s ease-in-out infinite;
         }
 
+        #how-gradcam-works .gc-visual-inner {
+          background-color: rgba(255, 255, 255, 0.95);
+          border: 1.5px solid rgba(20, 184, 166, 0.35);
+          box-shadow: 0 8px 24px -4px rgba(20, 184, 166, 0.12);
+          backdrop-filter: blur(6px);
+          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         /* Active stage — teal */
         #how-gradcam-works .gc-stage.is-active .gc-icon {
           background-color: #ccfbf1;
@@ -1057,8 +1067,10 @@
           box-shadow: none;
         }
         #how-gradcam-works .gc-stage.is-active .gc-visual-inner {
-          background-color: rgba(240,253,250,0.7);
-          box-shadow: inset 0 0 0 1px rgba(153,246,228,0.5);
+          background-color: #ffffff;
+          border-color: #0d9488;
+          border-width: 2px;
+          box-shadow: 0 12px 25px -4px rgba(20, 184, 166, 0.22), 0 4px 10px -4px rgba(20, 184, 166, 0.22);
         }
         /* Active stage — amber (Gradient Flow only) */
         #how-gradcam-works .gc-stage-amber.is-active .gc-icon {
@@ -1070,15 +1082,17 @@
           box-shadow: none;
         }
         #how-gradcam-works .gc-stage-amber.is-active .gc-visual-inner {
-          background-color: rgba(255,251,235,0.7);
-          box-shadow: inset 0 0 0 1px rgba(253,230,138,0.5);
+          background-color: #ffffff;
+          border-color: #d97706;
+          border-width: 2px;
+          box-shadow: 0 12px 25px -4px rgba(245, 158, 11, 0.22), 0 4px 10px -4px rgba(245, 158, 11, 0.22);
         }
 
         /* Step card active */
         #how-gradcam-works .gc-step-card.is-active {
           border-color: #14b8a6;
           background-color: #ffffff;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 1px rgba(20,184,166,0.2);
+          box-shadow: 0 10px 20px -3px rgba(13,148,136,0.12), 0 4px 6px -4px rgba(13,148,136,0.12), 0 0 0 1px rgba(20,184,166,0.25);
         }
         #how-gradcam-works .gc-step-card.is-active .gc-step-badge {
           background-color: #0d9488;
@@ -1086,16 +1100,16 @@
           box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
         }
         #how-gradcam-works .gc-step-card.is-active .gc-step-title {
-          color: #1e293b;
+          color: #0f766e;
           font-weight: 700;
         }
         #how-gradcam-works .gc-step-card.is-active .gc-step-desc {
-          color: #475569;
+          color: #334155;
           opacity: 1;
         }
 
         /* 3D stacked layers (Stage 2) */
-        #how-gradcam-works .gc-stack { transform: rotateX(60deg) rotateZ(-45deg); transform-style: preserve-3d; }
+        #how-gradcam-works .gc-stack { transform: rotateY(-30deg) rotateX(15deg); transform-style: preserve-3d; }
         #how-gradcam-works .gc-stack-layer {
           position: absolute;
           background-color: rgba(45,212,191,0.15);
@@ -1125,7 +1139,7 @@
             <h2 id="gradcam-heading" class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight">
               How the Coral Health Model Works
             </h2>
-            <p class="text-slate-500 text-lg md:text-xl leading-relaxed">
+            <p class="text-slate-600 text-lg md:text-xl leading-relaxed">
               Reef images are standardized, passed through the EfficientNet-B0 classifier, and mapped to Healthy, Bleached, or Dead labels with confidence scores. Grad-CAM overlays then highlight the reef regions that most influenced each prediction for transparent review.
             </p>
           </div>
@@ -1156,7 +1170,7 @@
 
               <!-- Connector 1 -->
               <div class="flex-1 relative flex items-center h-[160px] mt-[90px] min-w-[40px]">
-                <div class="w-full border-t-2 border-dashed border-slate-200"></div>
+                <div class="w-full border-t-2 border-dashed border-teal-200/50"></div>
                 <div class="top-1/2 -translate-y-1/2 text-teal-400 gc-arrow">
                   <i data-lucide="arrow-right" class="w-[18px] h-[18px]" stroke-width="3"></i>
                 </div>
@@ -1175,11 +1189,11 @@
                   <div class="gc-visual-inner rounded-2xl p-3 transition-all duration-500">
                     <div class="relative w-36 h-36" style="perspective: 1000px;">
                       <div class="w-full h-full relative gc-stack">
-                        <div class="gc-stack-layer" style="transform: translateZ(0px);  width: 100%; height: 100%; left: 0%;  top: 0%;"></div>
-                        <div class="gc-stack-layer" style="transform: translateZ(12px); width: 94%;  height: 94%;  left: 3%;  top: 3%;"></div>
-                        <div class="gc-stack-layer" style="transform: translateZ(24px); width: 88%;  height: 88%;  left: 6%;  top: 6%;"></div>
-                        <div class="gc-stack-layer" style="transform: translateZ(36px); width: 82%;  height: 82%;  left: 9%;  top: 9%;"></div>
-                        <div class="gc-stack-layer" style="transform: translateZ(48px); width: 76%;  height: 76%;  left: 12%; top: 12%;"></div>
+                        <div class="gc-stack-layer" style="transform: translateZ(0px) translateX(0px); width: 100%; height: 100%; left: 0%; top: 0%;"></div>
+                        <div class="gc-stack-layer" style="transform: translateZ(-15px) translateX(15px); width: 100%; height: 100%; left: 0%; top: 0%;"></div>
+                        <div class="gc-stack-layer" style="transform: translateZ(-30px) translateX(30px); width: 100%; height: 100%; left: 0%; top: 0%;"></div>
+                        <div class="gc-stack-layer" style="transform: translateZ(-45px) translateX(45px); width: 100%; height: 100%; left: 0%; top: 0%;"></div>
+                        <div class="gc-stack-layer" style="transform: translateZ(-60px) translateX(60px); width: 100%; height: 100%; left: 0%; top: 0%;"></div>
                       </div>
                     </div>
                   </div>
@@ -1188,7 +1202,7 @@
 
               <!-- Connector 2 -->
               <div class="flex-1 relative flex items-center h-[160px] mt-[90px] min-w-[40px]">
-                <div class="w-full border-t-2 border-dashed border-slate-200"></div>
+                <div class="w-full border-t-2 border-dashed border-teal-200/50"></div>
                 <div class="top-1/2 -translate-y-1/2 text-teal-400 gc-arrow" style="animation-delay: 0.5s;">
                   <i data-lucide="arrow-right" class="w-[18px] h-[18px]" stroke-width="3"></i>
                 </div>
@@ -1225,7 +1239,7 @@
 
               <!-- Connector 3 -->
               <div class="flex-1 relative flex items-center h-[160px] mt-[90px] min-w-[40px]">
-                <div class="w-full border-t-2 border-dashed border-slate-200"></div>
+                <div class="w-full border-t-2 border-dashed border-teal-200/50"></div>
                 <div class="top-1/2 -translate-y-1/2 text-teal-400 gc-arrow" style="animation-delay: 1s;">
                   <i data-lucide="arrow-right" class="w-[18px] h-[18px]" stroke-width="3"></i>
                 </div>
@@ -1241,7 +1255,7 @@
                   <div class="text-xs font-medium text-slate-500 mt-0.5">Logit Computation</div>
                 </div>
                 <div class="gc-visual h-[160px] w-full flex items-center justify-center rounded-2xl transition-all duration-500 bg-transparent">
-                  <div class="gc-visual-inner w-full bg-white border border-slate-200 rounded-xl p-3 shadow-sm mx-1 transition-all duration-500">
+                  <div class="gc-visual-inner w-full rounded-2xl p-3 mx-1 transition-all duration-500">
                     <div class="space-y-2.5">
                       <div>
                         <div class="flex justify-between items-center mb-1">
@@ -1277,7 +1291,7 @@
 
               <!-- Connector 4 -->
               <div class="flex-1 relative flex items-center h-[160px] mt-[90px] min-w-[40px]">
-                <div class="w-full border-t-2 border-dashed border-slate-200"></div>
+                <div class="w-full border-t-2 border-dashed border-teal-200/50"></div>
                 <div class="top-1/2 -translate-y-1/2 text-teal-400 gc-arrow" style="animation-delay: 1.5s;">
                   <i data-lucide="arrow-right" class="w-[18px] h-[18px]" stroke-width="3"></i>
                 </div>
@@ -1293,12 +1307,12 @@
                   <div class="text-xs font-medium text-slate-500 mt-0.5">Result Comparison</div>
                 </div>
                 <div class="gc-visual h-[160px] w-full flex items-center rounded-2xl transition-all duration-500 bg-transparent">
-                  <div class="gc-visual-inner flex items-stretch bg-white border border-slate-200 rounded-2xl p-2 shadow-md gap-3 w-full transition-all duration-500">
+                  <div class="gc-visual-inner flex items-stretch rounded-2xl p-2 gap-3 w-full transition-all duration-500">
                     <div class="flex-1 flex flex-col items-center gap-1.5">
                       <div class="w-full rounded-lg overflow-hidden relative border border-slate-100" style="height: 110px;">
                         <img src="/static/img/healthy_original.png" alt="Healthy sample without Grad-CAM" class="w-full h-full object-cover object-center" loading="lazy" />
                       </div>
-                      <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Standard</span>
+                      <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Standard</span>
                     </div>
                     <div class="w-[1px] bg-slate-100 relative my-2 flex-shrink-0">
                       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-1.5 py-0.5 text-[8px] text-slate-400 font-black uppercase tracking-widest rounded border border-slate-100 shadow-sm">VS</div>
@@ -1319,42 +1333,42 @@
           <!-- Step Cards Row -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 w-full">
 
-            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white hover:border-teal-300 shadow-sm" data-step="0">
+            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white/40 backdrop-blur-md hover:border-teal-300 hover:bg-white/60 shadow-sm" data-step="0">
               <div class="flex items-center gap-3">
-                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-200 text-slate-500">1</div>
-                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-500">Raw Input</h4>
+                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-300/40 text-slate-600">1</div>
+                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-600">Raw Input</h4>
               </div>
-              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-600">
+              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-700">
                 High-resolution footage is pre-processed into 224×224 RGB tensors before being fed into the architecture.
               </div>
             </button>
 
-            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white hover:border-teal-300 shadow-sm" data-step="1">
+            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white/40 backdrop-blur-md hover:border-teal-300 hover:bg-white/60 shadow-sm" data-step="1">
               <div class="flex items-center gap-3">
-                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-200 text-slate-500">2</div>
-                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-500">Forward Pass</h4>
+                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-300/40 text-slate-600">2</div>
+                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-600">Forward Pass</h4>
               </div>
-              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-600">
+              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-700">
                 The image flows through convolutional layers, extracting hierarchical spatial features and abstract representations.
               </div>
             </button>
 
-            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white hover:border-teal-300 shadow-sm" data-step="2">
+            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white/40 backdrop-blur-md hover:border-teal-300 hover:bg-white/60 shadow-sm" data-step="2">
               <div class="flex items-center gap-3">
-                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-200 text-slate-500">3</div>
-                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-500">Backpropagation</h4>
+                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-300/40 text-slate-600">3</div>
+                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-600">Backpropagation</h4>
               </div>
-              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-600">
+              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-700">
                 The model calculates gradients backwards to the final convolutional layer to measure feature importance.
               </div>
             </button>
 
-            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white hover:border-teal-300 shadow-sm" data-step="3">
+            <button type="button" class="gc-step-card text-left p-5 rounded-xl border transition-all duration-500 cursor-pointer flex flex-col gap-3 border-slate-200 bg-white/40 backdrop-blur-md hover:border-teal-300 hover:bg-white/60 shadow-sm" data-step="3">
               <div class="flex items-center gap-3">
-                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-200 text-slate-500">4</div>
-                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-500">Heatmap Generation</h4>
+                <div class="gc-step-badge w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500 bg-slate-300/40 text-slate-600">4</div>
+                <h4 class="gc-step-title text-sm transition-colors duration-500 font-semibold text-slate-600">Heatmap Generation</h4>
               </div>
-              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-600">
+              <div class="gc-step-desc text-[13px] leading-relaxed transition-all duration-500 text-slate-700">
                 Gradients act as weights for the feature maps, producing a colored heatmap highlighting important visual regions.
               </div>
             </button>
@@ -1409,7 +1423,8 @@
     <!-- GradCAM 3D Interactive Simulation (light theme, refactored)  -->
     <!-- ============================================================ -->
     <section id="gradcam-3d"
-      class="py-24 bg-[#0b1121] border-t-2 border-slate-800 relative overflow-hidden"
+      class="py-24 border-t-2 border-slate-800 relative overflow-hidden"
+      style="background: radial-gradient(circle at 30% 40%, rgba(94,234,212,0.10), transparent 32%), radial-gradient(circle at 70% 60%, rgba(34,211,238,0.07), transparent 35%), linear-gradient(180deg, #0b1121 0%, #05111f 100%);"
       aria-labelledby="gradcam3d-heading">
 
       <!-- Section header -->
@@ -1453,11 +1468,11 @@
 
           <!-- Overlay control panel -->
           <div id="gc3d-panel"
-               class="absolute bottom-0 left-0 right-0 bg-[#0b1121]/85 backdrop-blur-md border-t border-slate-700 px-6 pt-3 pb-4 z-10 flex flex-col gap-3">
+               class="absolute bottom-0 left-0 right-0 bg-[#060c18]/80 backdrop-blur-lg border-t border-teal-500/20 px-6 pt-3 pb-4 z-10 flex flex-col gap-3">
 
             <!-- Plain-English / Math formula strip -->
             <div class="flex items-center gap-3 justify-center">
-              <div id="gc3d-formula" class="flex-1 min-w-0 max-w-3xl text-center text-[13px] sm:text-[14px] font-mono text-white font-bold bg-slate-900/80 border border-slate-600/70 rounded-lg px-4 py-2 overflow-x-auto whitespace-nowrap shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+              <div id="gc3d-formula" class="flex-1 min-w-0 max-w-3xl text-center text-[13px] sm:text-[14px] font-mono text-white font-bold bg-[#040811]/90 border border-teal-500/25 rounded-lg px-4 py-2 overflow-x-auto whitespace-nowrap shadow-[0_0_15px_rgba(20,184,166,0.15)]">
                 <span id="gc3d-formula-plain" class="drop-shadow-md">Combine the detectors, weighted by importance, keep only the bright areas.</span>
                 <span id="gc3d-formula-math" class="hidden">
                   <span class="gc3d-pill teal">L<sub>Grad-CAM</sub> = ReLU(</span>
@@ -1470,16 +1485,31 @@
                 </span>
               </div>
               <button id="gc3d-formula-toggle" onclick="gcToggleFormula()"
-                class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-800/80 backdrop-blur-xl border border-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:bg-slate-700 hover:text-white hover:border-slate-400 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 transition-all duration-300">
+                class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-900/90 backdrop-blur-xl border border-slate-700 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:bg-slate-800 hover:text-white hover:border-teal-500/50 hover:shadow-[0_0_15px_rgba(20,184,166,0.2)] hover:-translate-y-0.5 transition-all duration-300">
                 Show math
               </button>
+            </div>
+
+            <!-- Proven Dataset Samples Strip -->
+            <div id="gc3d-samples-carousel" class="flex flex-col gap-1.5 border-b border-teal-500/10 pb-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-teal-400/90 uppercase tracking-widest flex items-center gap-1.5 font-mono">
+                  <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse shadow-[0_0_8px_#2dd4bf]"></span>
+                  Proven Dataset Test Samples
+                </span>
+              </div>
+              <div id="simulation-samples-list" class="flex gap-3 overflow-x-auto py-1 scrollbar-thin scrollbar-thumb-teal-500/20 scrollbar-track-transparent">
+                <div class="animate-pulse flex items-center justify-center w-full py-2 text-xs text-slate-500 font-mono">
+                  Initializing sample stream...
+                </div>
+              </div>
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-4">
               <div class="flex items-center gap-3">
                 <span class="text-slate-300 text-sm font-medium">Target Class:</span>
                 <select id="gc3d-class"
-                        class="bg-slate-800 border border-slate-600 text-slate-100 text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-400 focus:outline-none shadow-sm">
+                        class="bg-slate-900 border border-teal-500/30 text-slate-100 text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-400 focus:outline-none shadow-sm hover:border-teal-500/60 transition-colors">
                   <option value="Healthy">Healthy &mdash; F1 0.986</option>
                   <option value="Bleached">Bleached &mdash; F1 0.979</option>
                   <option value="Dead">Dead &mdash; F1 0.966</option>
@@ -1488,38 +1518,38 @@
 
               <div class="flex items-center gap-2 flex-wrap justify-center">
                 <button onclick="gcSetStep(1)" id="gc-btn-1"
-                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 hover:border-sky-400/50 transition-all shadow-sm">
+                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 hover:border-sky-400/50 transition-all shadow-sm">
                   1. Forward Pass
                 </button>
                 <button onclick="gcSetStep(2)" id="gc-btn-2"
-                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-orange-500/15 hover:text-orange-300 hover:border-orange-400/50 transition-all shadow-sm">
+                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-orange-500/15 hover:text-orange-300 hover:border-orange-400/50 transition-all shadow-sm">
                   2. Backpropagation
                 </button>
                 <button onclick="gcSetStep(3)" id="gc-btn-3"
-                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-violet-500/15 hover:text-violet-300 hover:border-violet-400/50 transition-all shadow-sm">
+                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-violet-500/15 hover:text-violet-300 hover:border-violet-400/50 transition-all shadow-sm">
                   3. Pool &alpha;<sub>k</sub>
                 </button>
                 <button onclick="gcSetStep(4)" id="gc-btn-4"
-                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-teal-500/15 hover:text-teal-300 hover:border-teal-400/50 transition-all shadow-sm">
+                  class="gc3d-step-btn px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-teal-500/15 hover:text-teal-300 hover:border-teal-400/50 transition-all shadow-sm">
                   4. Heatmap
                 </button>
               </div>
 
               <div class="flex items-center gap-3">
                 <button onclick="gcPrev()" id="gc-btn-prev" title="Previous step"
-                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 shadow-md hover:scale-110 transition-all duration-300">
+                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 shadow-md hover:border-teal-500/40 hover:scale-110 transition-all duration-300">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
                 <button onclick="gcTogglePlay()" id="gc-btn-play" title="Play/Pause"
-                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 shadow-md hover:scale-110 transition-all duration-300">
+                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 shadow-md hover:border-teal-500/40 hover:scale-110 transition-all duration-300">
                   <svg class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 </button>
                 <button onclick="gcNext()" id="gc-btn-next" title="Next step"
-                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 shadow-md hover:scale-110 transition-all duration-300">
+                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 shadow-md hover:border-teal-500/40 hover:scale-110 transition-all duration-300">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
                 <button onclick="gcReset()" title="Reset"
-                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 shadow-md hover:scale-110 transition-all duration-300">
+                  class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 shadow-md hover:border-teal-500/40 hover:scale-110 transition-all duration-300">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
               </div>
@@ -1530,69 +1560,73 @@
 
       <!-- Step detail cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 px-6 max-w-6xl mx-auto">
-        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-700 bg-slate-800/50 hover:border-sky-400/60 hover:bg-slate-800/80 shadow-lg shadow-slate-900/40" data-step="1" onclick="gcSetStep(1)">
+        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-850 bg-[#0c1527]/50 hover:border-sky-500/50 hover:bg-[#0c1527]/85 shadow-lg shadow-black/40" data-step="1" onclick="gcSetStep(1)">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 flex items-center justify-center text-sm font-bold">1</div>
-            <h4 class="text-base font-bold text-white">Forward Pass</h4>
+            <div class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 flex items-center justify-center text-sm font-bold shadow-[0_0_8px_rgba(14,165,233,0.3)]">1</div>
+            <h4 class="text-base font-bold text-white uppercase tracking-wider text-[13px]">Forward Pass</h4>
           </div>
           <p class="text-sm text-slate-300 leading-relaxed">
             The coral image projects through EfficientNetB0. The final conv layer produces 6 spatial feature maps A<sup>k</sup> encoding texture, colour, and shape.
           </p>
-          <div class="mt-3 text-[11px] font-mono text-sky-300 bg-sky-500/10 border border-sky-400/20 rounded px-2 py-1">
-            Produces: A<sup>k</sup> feature maps
+          <div class="mt-3 text-[11px] font-mono text-sky-300 bg-sky-500/10 border border-sky-400/20 rounded px-2 py-1 flex justify-between">
+            <span>Produces: A<sup>k</sup> maps</span>
+            <span class="opacity-65">[CH: 6 &middot; 7x7]</span>
           </div>
         </div>
 
-        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-700 bg-slate-800/50 hover:border-orange-400/60 hover:bg-slate-800/80 shadow-lg shadow-slate-900/40" data-step="2" onclick="gcSetStep(2)">
+        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-850 bg-[#0c1527]/50 hover:border-orange-500/50 hover:bg-[#0c1527]/85 shadow-lg shadow-black/40" data-step="2" onclick="gcSetStep(2)">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 flex items-center justify-center text-sm font-bold">2</div>
-            <h4 class="text-base font-bold text-white">Backpropagation</h4>
+            <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 flex items-center justify-center text-sm font-bold shadow-[0_0_8px_rgba(249,115,22,0.3)]">2</div>
+            <h4 class="text-base font-bold text-white uppercase tracking-wider text-[13px]">Backpropagation</h4>
           </div>
           <p class="text-sm text-slate-300 leading-relaxed">
             Glowing red arrows flow backward from the class score node, measuring each map's influence on the prediction.
           </p>
-          <div class="mt-3 text-[11px] font-mono text-orange-300 bg-orange-500/10 border border-orange-400/20 rounded px-2 py-1">
-            Computes: &part;y<sup>c</sup> / &part;A<sup>k</sup><sub>ij</sub>
+          <div class="mt-3 text-[11px] font-mono text-orange-300 bg-orange-500/10 border border-orange-400/20 rounded px-2 py-1 flex justify-between">
+            <span>Computes: &part;y<sup>c</sup> / &part;A<sup>k</sup><sub>ij</sub></span>
+            <span class="opacity-65">[Trace gradients]</span>
           </div>
         </div>
 
-        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-700 bg-slate-800/50 hover:border-violet-400/60 hover:bg-slate-800/80 shadow-lg shadow-slate-900/40" data-step="3" onclick="gcSetStep(3)">
+        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-850 bg-[#0c1527]/50 hover:border-violet-500/50 hover:bg-[#0c1527]/85 shadow-lg shadow-black/40" data-step="3" onclick="gcSetStep(3)">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-full bg-violet-500/20 text-violet-300 border border-violet-400/30 flex items-center justify-center text-sm font-bold">3</div>
-            <h4 class="text-base font-bold text-white">Pool &alpha;<sub>k</sub></h4>
+            <div class="w-8 h-8 rounded-full bg-violet-500/20 text-violet-300 border border-violet-400/30 flex items-center justify-center text-sm font-bold shadow-[0_0_8px_rgba(139,92,246,0.3)]">3</div>
+            <h4 class="text-base font-bold text-white uppercase tracking-wider text-[13px]">Pool &alpha;<sub>k</sub></h4>
           </div>
           <p class="text-sm text-slate-300 leading-relaxed">
             Each gradient map collapses by Global Average Pooling into a single scalar weight &alpha;<sub>k</sub> &mdash; the bars rise where the maps were.
           </p>
-          <div class="mt-3 text-[11px] font-mono text-violet-300 bg-violet-500/10 border border-violet-400/20 rounded px-2 py-1">
-            &alpha;<sub>k</sub> = (1/Z) &Sigma;<sub>ij</sub> &part;y<sup>c</sup> / &part;A<sup>k</sup><sub>ij</sub>
+          <div class="mt-3 text-[11px] font-mono text-violet-300 bg-violet-500/10 border border-violet-400/20 rounded px-2 py-1 flex justify-between">
+            <span>GAP: &alpha;<sub>k</sub> scalars</span>
+            <span class="opacity-65">[Average pool]</span>
           </div>
         </div>
 
-        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-700 bg-slate-800/50 hover:border-teal-400/60 hover:bg-slate-800/80 shadow-lg shadow-slate-900/40" data-step="4" onclick="gcSetStep(4)">
+        <div class="gc3d-card rounded-xl border p-5 cursor-pointer transition-all border-slate-850 bg-[#0c1527]/50 hover:border-teal-500/50 hover:bg-[#0c1527]/85 shadow-lg shadow-black/40" data-step="4" onclick="gcSetStep(4)">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-full bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-sm font-bold">4</div>
-            <h4 class="text-base font-bold text-white">Heatmap + ReLU</h4>
+            <div class="w-8 h-8 rounded-full bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center justify-center text-sm font-bold shadow-[0_0_8px_rgba(20,184,166,0.3)]">4</div>
+            <h4 class="text-base font-bold text-white uppercase tracking-wider text-[13px]">Heatmap + ReLU</h4>
           </div>
           <p class="text-sm text-slate-300 leading-relaxed">
             Feature maps multiply by &alpha;<sub>k</sub>, merge into one plane, ReLU clips negatives, and the jet colormap reveals the attention heatmap.
           </p>
-          <div class="mt-3 text-[11px] font-mono text-teal-300 bg-teal-500/10 border border-teal-400/20 rounded px-2 py-1">
-            L = ReLU( &Sigma;<sub>k</sub> &alpha;<sub>k</sub> &middot; A<sup>k</sup> )
+          <div class="mt-3 text-[11px] font-mono text-teal-300 bg-teal-500/10 border border-teal-400/20 rounded px-2 py-1 flex justify-between">
+            <span>L = ReLU( &Sigma;<sub>k</sub> &alpha;<sub>k</sub> &middot; A<sup>k</sup> )</span>
+            <span class="opacity-65">[Colormap fusion]</span>
           </div>
         </div>
       </div>
 
       <style>
-        #gradcam-3d .gc3d-step-btn.is-active-1 { background:#0284c7; color:#fff; border-color:#0284c7; }
-        #gradcam-3d .gc3d-step-btn.is-active-2 { background:#f97316; color:#fff; border-color:#f97316; }
-        #gradcam-3d .gc3d-step-btn.is-active-3 { background:#7c3aed; color:#fff; border-color:#7c3aed; }
-        #gradcam-3d .gc3d-step-btn.is-active-4 { background:#0d9488; color:#fff; border-color:#0d9488; }
+        #gradcam-3d .gc3d-step-btn.is-active-1 { background:#0ea5e9; color:#fff; border-color:#38bdf8; box-shadow: 0 0 15px rgba(14,165,233,0.4); }
+        #gradcam-3d .gc3d-step-btn.is-active-2 { background:#f97316; color:#fff; border-color:#fb923c; box-shadow: 0 0 15px rgba(249,115,22,0.4); }
+        #gradcam-3d .gc3d-step-btn.is-active-3 { background:#8b5cf6; color:#fff; border-color:#a78bfa; box-shadow: 0 0 15px rgba(139,92,246,0.4); }
+        #gradcam-3d .gc3d-step-btn.is-active-4 { background:#14b8a6; color:#fff; border-color:#2dd4bf; box-shadow: 0 0 15px rgba(20,184,166,0.4); }
 
-        #gradcam-3d .gc3d-card.is-active-1 { border-color:#38bdf8; background:rgba(14,165,233,0.10); box-shadow:0 6px 28px rgba(14,165,233,0.28); }
-        #gradcam-3d .gc3d-card.is-active-2 { border-color:#fb923c; background:rgba(249,115,22,0.10); box-shadow:0 6px 28px rgba(249,115,22,0.28); }
-        #gradcam-3d .gc3d-card.is-active-3 { border-color:#a78bfa; background:rgba(139,92,246,0.10); box-shadow:0 6px 28px rgba(139,92,246,0.28); }
-        #gradcam-3d .gc3d-card.is-active-4 { border-color:#2dd4bf; background:rgba(20,184,166,0.10); box-shadow:0 6px 28px rgba(20,184,166,0.28); }
+        #gradcam-3d .gc3d-card.is-active-1 { border-color:#38bdf8; background:rgba(14,165,233,0.12); box-shadow:0 8px 30px rgba(14,165,233,0.3); }
+        #gradcam-3d .gc3d-card.is-active-2 { border-color:#fb923c; background:rgba(249,115,22,0.12); box-shadow:0 8px 30px rgba(249,115,22,0.3); }
+        #gradcam-3d .gc3d-card.is-active-3 { border-color:#a78bfa; background:rgba(139,92,246,0.12); box-shadow:0 8px 30px rgba(139,92,246,0.3); }
+        #gradcam-3d .gc3d-card.is-active-4 { border-color:#2dd4bf; background:rgba(20,184,166,0.12); box-shadow:0 8px 30px rgba(20,184,166,0.3); }
 
         #gradcam-3d .gc3d-label {
           position:absolute;
@@ -1600,16 +1634,16 @@
           font-size:11px;
           font-weight:600;
           color:#e2e8f0;
-          background:rgba(15,23,42,0.85);
-          backdrop-filter: blur(6px);
+          background:rgba(6,12,24,0.9);
+          backdrop-filter: blur(8px);
           border:1px solid rgba(45,212,191,0.35);
-          padding:3px 8px;
+          padding:4px 9px;
           border-radius:6px;
-          box-shadow:0 2px 12px rgba(0,0,0,0.45);
+          box-shadow:0 4px 16px rgba(0,0,0,0.65);
           pointer-events:none;
           transform: translate(-50%,-120%);
           white-space:pre;
-          line-height:1.3;
+          line-height:1.35;
           letter-spacing: 0.02em;
         }
         @media (max-width: 640px) {
@@ -1623,23 +1657,23 @@
           padding: 2px 8px; border-radius: 6px; margin: 0 2px;
           border: 1px solid transparent;
           transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
-          opacity: 0.6; color: #e2e8f0; /* Clear bright white for inactive */
+          opacity: 0.55; color: #cbd5e1;
         }
         #gradcam-3d .gc3d-pill.on { 
           opacity: 1; filter: none; color: #ffffff; 
-          text-shadow: 0 0 10px rgba(255,255,255,0.5); 
+          text-shadow: 0 0 10px rgba(255,255,255,0.6); 
           font-weight: 800; 
           transform: scale(1.08); 
         }
-        #gradcam-3d .gc3d-pill.sky.on    { background: rgba(14,165,233,0.3); color: #bae6fd; border-color: rgba(14,165,233,0.8); box-shadow: 0 0 15px rgba(14,165,233,0.5); }
-        #gradcam-3d .gc3d-pill.orange.on { background: rgba(249,115,22,0.3); color: #fed7aa; border-color: rgba(249,115,22,0.8); box-shadow: 0 0 15px rgba(249,115,22,0.5); }
-        #gradcam-3d .gc3d-pill.violet.on { background: rgba(124,58,237,0.3); color: #ddd6fe; border-color: rgba(124,58,237,0.8); box-shadow: 0 0 15px rgba(124,58,237,0.5); }
-        #gradcam-3d .gc3d-pill.teal.on   { background: rgba(13,148,136,0.3); color: #99f6e4; border-color: rgba(13,148,136,0.8); box-shadow: 0 0 15px rgba(13,148,136,0.5); }
+        #gradcam-3d .gc3d-pill.sky.on    { background: rgba(14,165,233,0.35); color: #bae6fd; border-color: rgba(14,165,233,0.85); box-shadow: 0 0 15px rgba(14,165,233,0.5); }
+        #gradcam-3d .gc3d-pill.orange.on { background: rgba(249,115,22,0.35); color: #fed7aa; border-color: rgba(249,115,22,0.85); box-shadow: 0 0 15px rgba(249,115,22,0.5); }
+        #gradcam-3d .gc3d-pill.violet.on { background: rgba(124,58,237,0.35); color: #ddd6fe; border-color: rgba(124,58,237,0.85); box-shadow: 0 0 15px rgba(124,58,237,0.5); }
+        #gradcam-3d .gc3d-pill.teal.on   { background: rgba(13,148,136,0.35); color: #99f6e4; border-color: rgba(13,148,136,0.85); box-shadow: 0 0 15px rgba(13,148,136,0.5); }
 
         /* Step 2 transient popover near class node */
         #gradcam-3d .gc3d-popover {
           position: absolute;
-          background: rgba(15,23,42,0.92);
+          background: rgba(6,12,24,0.95);
           border: 1px solid rgba(251,146,60,0.55);
           color: #fed7aa;
           padding: 8px 12px;
@@ -1647,9 +1681,9 @@
           font-size: 12px;
           font-weight: 500;
           max-width: 220px;
-          line-height: 1.4;
+          line-height: 1.45;
           backdrop-filter: blur(8px);
-          box-shadow: 0 6px 24px rgba(0,0,0,0.55);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.65);
           pointer-events: none;
           transform: translate(-50%, -120%);
           z-index: 6;
@@ -1659,38 +1693,29 @@
         #gradcam-3d .gc3d-popover.visible { opacity: 1; }
 
         /* Narration ribbon step color accents */
-        #gradcam-3d #gc3d-narration.s1 { border-color: rgba(14,165,233,0.55); }
-        #gradcam-3d #gc3d-narration.s1 #gc3d-narr-step { color: #7dd3fc; }
-        #gradcam-3d #gc3d-narration.s2 { border-color: rgba(249,115,22,0.55); }
-        #gradcam-3d #gc3d-narration.s2 #gc3d-narr-step { color: #fdba74; }
-        #gradcam-3d #gc3d-narration.s3 { border-color: rgba(124,58,237,0.55); }
-        #gradcam-3d #gc3d-narration.s3 #gc3d-narr-step { color: #c4b5fd; }
-        #gradcam-3d #gc3d-narration.s4 { border-color: rgba(13,148,136,0.55); }
-        #gradcam-3d #gc3d-narration.s4 #gc3d-narr-step { color: #5eead4; }
+        #gradcam-3d #gc3d-narration.s1 { border-color: rgba(14,165,233,0.6); box-shadow: 0 0 20px rgba(14,165,233,0.15); }
+        #gradcam-3d #gc3d-narration.s1 #gc3d-narr-step { color: #38bdf8; }
+        #gradcam-3d #gc3d-narration.s2 { border-color: rgba(249,115,22,0.6); box-shadow: 0 0 20px rgba(249,115,22,0.15); }
+        #gradcam-3d #gc3d-narration.s2 #gc3d-narr-step { color: #fb923c; }
+        #gradcam-3d #gc3d-narration.s3 { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 20px rgba(124,58,237,0.15); }
+        #gradcam-3d #gc3d-narration.s3 #gc3d-narr-step { color: #a78bfa; }
+        #gradcam-3d #gc3d-narration.s4 { border-color: rgba(20,184,166,0.6); box-shadow: 0 0 20px rgba(20,184,166,0.15); }
+        #gradcam-3d #gc3d-narration.s4 #gc3d-narr-step { color: #2dd4bf; }
 
         #gradcam-3d #gc3d-onboard.visible { opacity: 1; }
       </style>
 
       <script>
       (function(){
-        const READY = { three:false, orbit:false, gsap:false };
-        function loadScript(src, onload){
-          const s = document.createElement('script');
-          s.src = src; s.async = false; s.onload = onload;
-          document.head.appendChild(s);
-        }
-        function ready(){
-          if (READY.three && READY.orbit && READY.gsap) initGC3D();
-        }
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', function(){
-          READY.three = true;
-          loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', function(){
-            READY.orbit = true;
-            loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', function(){
-              READY.gsap = true; ready();
-            });
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function(){
+            initGC3D();
+            if (window.initGC3DSamples) window.initGC3DSamples();
           });
-        });
+        } else {
+          initGC3D();
+          if (window.initGC3DSamples) window.initGC3DSamples();
+        }
 
         const GC_CLASSES = {
           Healthy:  { color: 0x22c55e, hex: '#22c55e', label: 'Healthy',  f1: '0.986' },
@@ -1713,12 +1738,25 @@
         let isPlaying = false;
         let playCallId = null;
         let onboardShown = false;
+        let step2DelayedCalls = [];
 
-        const ALPHA_VALUES = [1.8, 0.9, 1.5, 2.1, 0.6, 1.7];
-        const ALPHA_MAX = Math.max.apply(null, ALPHA_VALUES);
-        const FMAP_Z   = [-1.5,-0.9,-0.3, 0.3, 0.9, 1.5];
+        // Subagent 1 & 2 definitions
+        let signalParticles = [];
+        let curves = [];
+        let scannerLine = null; // Subagent 4
+
+        // Subagent 3: Raycasting Hover HUD
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoverReticle = null;
+        let hoverHUD = null;
+        let hoveredObject = null;
+
+        let ALPHA_VALUES = [1.8, 0.9, 1.5, 2.1, 0.6, 1.7];
+        let ALPHA_MAX = Math.max.apply(null, ALPHA_VALUES);
+        const FMAP_Z   = [-3.5, -2.1, -0.7, 0.7, 2.1, 3.5];
         const FMAP_BASE_X = 1;
-        const FMAP_INITIAL_OPACITY = 0.55;
+        const FMAP_INITIAL_OPACITY = 0.6;
         let labels = [];
 
         // ---- texture builders ----------------------------------------------
@@ -1749,21 +1787,68 @@
           return new THREE.CanvasTexture(c);
         }
 
-        function makeFmapTexture(seed){
-          const N = 16;
-          const c = document.createElement('canvas'); c.width=c.height=N;
+        // Subagent 1: Volumetric Holographic Feature map textures
+        function makeFmapTexture(index, seed){
+          const size = 256;
+          const c = document.createElement('canvas'); c.width = c.height = size;
           const g = c.getContext('2d');
-          for (let y=0;y<N;y++){
-            for (let x=0;x<N;x++){
-              const n = (Math.sin(x*1.7+seed)*Math.cos(y*2.3+seed)+1)/2;
-              const sat = 50 + n*30;
-              const light = 30 + n*45;
-              g.fillStyle = 'hsl(185,'+sat.toFixed(0)+'%,'+light.toFixed(0)+'%)';
-              g.fillRect(x,y,1,1);
-            }
+          
+          // Background matrix grid (very dark technical blue)
+          g.fillStyle = '#050a14';
+          g.fillRect(0,0,size,size);
+          
+          g.strokeStyle = 'rgba(20, 184, 166, 0.12)';
+          g.lineWidth = 1;
+          const gridCount = 8;
+          const step = size / gridCount;
+          for(let i=0; i<=gridCount; i++) {
+            g.beginPath();
+            g.moveTo(i*step, 0); g.lineTo(i*step, size);
+            g.moveTo(0, i*step); g.lineTo(size, i*step);
+            g.stroke();
           }
+          
+          // Draw some neural activation hot-spots (glowing circles with dynamic positions)
+          for(let i=0; i<3; i++) {
+            const radSeed = seed + i * 4.5;
+            const cx = (Math.sin(radSeed * 1.5) * 0.28 + 0.5) * size;
+            const cy = (Math.cos(radSeed * 2.1) * 0.28 + 0.5) * size;
+            const radius = (Math.sin(radSeed * 0.85) * 0.12 + 0.22) * size;
+            
+            const grad = g.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            const alpha = 0.65;
+            grad.addColorStop(0, `rgba(45, 212, 191, ${alpha})`);
+            grad.addColorStop(0.35, `rgba(20, 184, 166, ${alpha * 0.35})`);
+            grad.addColorStop(1, 'rgba(20, 184, 166, 0)');
+            
+            g.fillStyle = grad;
+            g.beginPath();
+            g.arc(cx, cy, radius, 0, Math.PI*2);
+            g.fill();
+          }
+          
+          // Technical corner marks "[ ]"
+          g.strokeStyle = 'rgba(45, 212, 191, 0.7)';
+          g.lineWidth = 2;
+          const pad = 12;
+          const len = 16;
+          // Top-left
+          g.beginPath(); g.moveTo(pad+len, pad); g.lineTo(pad, pad); g.lineTo(pad, pad+len); g.stroke();
+          // Top-right
+          g.beginPath(); g.moveTo(size-pad-len, pad); g.lineTo(size-pad, pad); g.lineTo(size-pad, pad+len); g.stroke();
+          // Bottom-left
+          g.beginPath(); g.moveTo(pad+len, size-pad); g.lineTo(pad, size-pad); g.lineTo(pad, size-pad-len); g.stroke();
+          // Bottom-right
+          g.beginPath(); g.moveTo(size-pad-len, size-pad); g.lineTo(size-pad, size-pad); g.lineTo(size-pad, size-pad-len); g.stroke();
+          
+          // Coordinate labels
+          g.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          g.font = 'bold 12px ui-monospace, SFMono-Regular, Menlo, monospace';
+          g.fillText(`DET-0${index+1}`, pad + 4, pad + 26);
+          g.fillText(`224x224`, size - pad - 60, size - pad - 6);
+          
           const tex = new THREE.CanvasTexture(c);
-          tex.magFilter = THREE.NearestFilter;
+          tex.magFilter = THREE.LinearFilter;
           tex.minFilter = THREE.LinearFilter;
           return tex;
         }
@@ -1829,15 +1914,55 @@
           if (!wrap || !camera) return;
           const W = wrap.clientWidth;
           const H = wrap.clientHeight;
+
+          const visibleLabels = [];
           labels.forEach(function(l){
             if (l.hidden) { l.divEl.style.display = 'none'; return; }
             l.divEl.style.display = '';
-            const v = l.mesh.getWorldPosition(new THREE.Vector3()).project(camera);
-            const x = (v.x+1)/2 * W;
-            const y = (-v.y+1)/2 * H;
-            l.divEl.style.left = x + 'px';
-            l.divEl.style.top  = y + 'px';
-            if (typeof l.getText === 'function') l.divEl.textContent = l.getText();
+            
+            const v = l.mesh.getWorldPosition(new THREE.Vector3());
+            const idx = alphaBars.indexOf(l.mesh);
+            if (idx !== -1) {
+              v.y = ALPHA_VALUES[idx] - 1;
+            }
+            
+            const projected = v.project(camera);
+            const x = (projected.x + 1)/2 * W;
+            const y = (-projected.y + 1)/2 * H;
+            
+            visibleLabels.push({
+              l: l,
+              x: x,
+              y: y,
+              width: 140,
+              height: 42
+            });
+          });
+
+          // Sort visible labels from top to bottom (by Y coordinate)
+          visibleLabels.sort(function(a, b){ return a.y - b.y; });
+
+          // Resolve overlaps iteratively
+          for (let i = 0; i < visibleLabels.length; i++) {
+            for (let j = 0; j < i; j++) {
+              const a = visibleLabels[j];
+              const b = visibleLabels[i];
+              const dx = Math.abs(a.x - b.x);
+              const dy = b.y - a.y; // b.y >= a.y because of sorting
+              
+              if (dx < 130 && dy < 38) {
+                b.y = a.y + 38;
+              }
+            }
+          }
+
+          // Apply coordinates to elements and update content
+          visibleLabels.forEach(function(vl){
+            vl.l.divEl.style.left = vl.x + 'px';
+            vl.l.divEl.style.top  = vl.y + 'px';
+            if (typeof vl.l.getText === 'function') {
+              vl.l.divEl.textContent = vl.l.getText();
+            }
           });
         }
 
@@ -1862,20 +1987,20 @@
           controls = new THREE.OrbitControls(camera, renderer.domElement);
           controls.enableDamping = true;
           controls.dampingFactor = 0.08;
-          controls.minDistance = 7;
+          controls.minDistance = 5;
           controls.maxDistance = 32;
 
-          scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-          const dirLight = new THREE.DirectionalLight(0x7dd3fc, 1.1);
+          scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+          const dirLight = new THREE.DirectionalLight(0x7dd3fc, 1.2);
           dirLight.position.set(8,12,8);
           scene.add(dirLight);
-          scene.add(new THREE.PointLight(0x14b8a6, 0.5, 30));
-          scene.add(new THREE.PointLight(0xfbbf24, 0.25, 30, 1.5));
+          scene.add(new THREE.PointLight(0x14b8a6, 0.65, 30));
+          scene.add(new THREE.PointLight(0xfbbf24, 0.3, 30, 1.5));
 
-          // Subtle floor reference
+          // Subtle grid floor
           const floor = new THREE.Mesh(
             new THREE.PlaneGeometry(40, 18),
-            new THREE.MeshBasicMaterial({ color: 0x14b8a6, transparent:true, opacity:0.08 })
+            new THREE.MeshBasicMaterial({ color: 0x14b8a6, transparent:true, opacity:0.06 })
           );
           floor.rotation.x = -Math.PI/2;
           floor.position.y = -2.6;
@@ -1903,23 +2028,33 @@
 
           // Feature map stack
           const fmapColors = [0x0d9488, 0x14b8a6, 0x2dd4bf, 0x5eead4, 0x99f6e4, 0xccfbf1];
-          const supers = ['¹','²','³','⁴','⁵','⁶'];
           for (let i=0;i<6;i++){
-            const tex = makeFmapTexture(i*1.3);
+            const tex = makeFmapTexture(i, i*1.4);
             const mat = new THREE.MeshStandardMaterial({
               map: tex, color: fmapColors[i], side: THREE.DoubleSide,
-              transparent:true, opacity: 0.0, roughness: 0.7
+              transparent:true, opacity: 0.15, roughness: 0.65
             });
             const plane = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), mat);
             plane.position.set(FMAP_BASE_X, 0, FMAP_Z[i]);
             scene.add(plane);
+            
+            // Subagent 1: Detailed pulsing wireframe borders
             const edges = new THREE.LineSegments(
               new THREE.EdgesGeometry(plane.geometry),
-              new THREE.LineBasicMaterial({ color: 0x14b8a6, transparent:true, opacity:0.0 })
+              new THREE.LineBasicMaterial({ color: 0x2dd4bf, transparent:true, opacity: 0.25 })
             );
             plane.add(edges);
             plane.userData.edges = edges;
             plane.userData.baseColor = fmapColors[i];
+
+            // Subagent 1: Thin rotating scanning rings around the feature maps
+            const ringGeo = new THREE.RingGeometry(1.5, 1.55, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x14b8a6, side: THREE.DoubleSide, transparent: true, opacity: 0.05 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.copy(plane.position);
+            scene.add(ring);
+            plane.userData.scanRing = ring;
+
             fmapPlanes.push(plane);
             addLabel(plane, 'Detector #' + (i+1));
           }
@@ -1938,17 +2073,32 @@
             beamLines.push(line);
           }
 
+          // Subagent 2: Signal flow particles along the straight projection beams for Step 1
+          signalParticles = [];
+          for (let i = 0; i < 6; i++) {
+            const dots = [];
+            for (let j = 0; j < 3; j++) {
+              const dot = new THREE.Mesh(
+                new THREE.SphereGeometry(0.07, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0 })
+              );
+              scene.add(dot);
+              dots.push(dot);
+            }
+            signalParticles.push(dots);
+          }
+
           // Class node
           classNode = new THREE.Mesh(
-            new THREE.SphereGeometry(0.45, 32, 32),
+            new THREE.SphereGeometry(0.48, 32, 32),
             new THREE.MeshStandardMaterial({
               color: GC_CLASSES[selectedClass].color,
               emissive: GC_CLASSES[selectedClass].color,
-              emissiveIntensity: 0.6, metalness: 0.3, roughness: 0.35
+              emissiveIntensity: 0.25, metalness: 0.35, roughness: 0.3
             })
           );
           classNode.position.set(5.2, 0, 0);
-          classNode.scale.set(0,0,0);
+          classNode.scale.set(0.7, 0.7, 0.7);
           scene.add(classNode);
           addLabel(classNode, function(){ return 'Decision:\n' + selectedClass; });
 
@@ -1969,19 +2119,30 @@
             gradArrows.push(arrow);
           }
 
-          // Flow dots for Step 2: small emissive red spheres that travel from class node toward each feature map
+          // Subagent 2: Curved Bezier splines and travelling gradient packets for Step 2
+          curves = [];
+          flowDots = [];
           for (let i=0;i<6;i++){
+            const start = classNode.position.clone();
+            const end = new THREE.Vector3(FMAP_BASE_X, 0, FMAP_Z[i]);
+            // Arch the control point upwards for an elegant flow visual
+            const control = new THREE.Vector3(
+              (start.x + end.x) / 2,
+              1.3,
+              (start.z + end.z) / 2 + (i - 2.5) * 0.4
+            );
+            curves.push(new THREE.QuadraticBezierCurve3(start, control, end));
+
             const dot = new THREE.Mesh(
-              new THREE.SphereGeometry(0.11, 16, 16),
+              new THREE.SphereGeometry(0.12, 16, 16),
               new THREE.MeshBasicMaterial({ color: 0xff5d5d, transparent: true, opacity: 0 })
             );
             dot.visible = false;
             scene.add(dot);
-            flowDots.push({ mesh: dot, fmapIndex: i, t: 0, active: false, offset: i*0.18 });
+            flowDots.push({ mesh: dot, fmapIndex: i, t: 0, active: false });
           }
 
           // Alpha bars
-          const subs = ['₁','₂','₃','₄','₅','₆'];
           for (let i=0;i<6;i++){
             const h = ALPHA_VALUES[i];
             const bar = new THREE.Mesh(
@@ -2029,10 +2190,34 @@
           // Weighted-merge plane (Step 4) - sits over input, grayscale-ish then becomes heatmap
           mergePlane = new THREE.Mesh(
             new THREE.PlaneGeometry(3, 3),
-            new THREE.MeshBasicMaterial({ color: 0x0f172a, transparent:true, opacity: 0, side: THREE.DoubleSide })
+            new THREE.MeshBasicMaterial({ color: 0x0a1424, transparent:true, opacity: 0, side: THREE.DoubleSide })
           );
           mergePlane.position.set(-6, 0, 0.03);
           scene.add(mergePlane);
+
+          // Subagent 4: Glowing vertical ReLU scanner line
+          scannerLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.08, 3.1),
+            new THREE.MeshBasicMaterial({ color: 0x2dd4bf, transparent: true, opacity: 0, side: THREE.DoubleSide })
+          );
+          scannerLine.position.set(-6, 0, 0.06);
+          scene.add(scannerLine);
+
+          // Raycasting hover initialization (Subagent 3)
+          hoverReticle = new THREE.Mesh(
+            new THREE.RingGeometry(0.12, 0.16, 32),
+            new THREE.MeshBasicMaterial({ color: 0x2dd4bf, transparent: true, opacity: 0, depthWrite: false })
+          );
+          scene.add(hoverReticle);
+          
+          hoverHUD = document.createElement('div');
+          hoverHUD.id = 'gc3d-hover-hud';
+          hoverHUD.className = 'absolute bg-slate-950/90 backdrop-blur-md border border-teal-500/40 rounded-xl p-3 text-xs text-white shadow-2xl pointer-events-none transition-opacity duration-300 opacity-0 z-[20] font-mono leading-relaxed';
+          hoverHUD.style.width = '195px';
+          document.getElementById('gc3d-labels').appendChild(hoverHUD);
+
+          wrap.addEventListener('mousemove', onMouseMove);
+          wrap.addEventListener('mouseleave', onMouseLeave);
 
           // Class selector
           const sel = document.getElementById('gc3d-class');
@@ -2045,9 +2230,51 @@
               b.material.color.setHex(c);
               b.material.emissive.setHex(c);
             });
+            
+            // Restore default procedural weights
+            ALPHA_VALUES = [1.8, 0.9, 1.5, 2.1, 0.6, 1.7];
+            ALPHA_MAX = Math.max.apply(null, ALPHA_VALUES);
+            
+            // Re-apply procedural textures
+            if (inputPlane && inputPlane.material) {
+              if (inputPlane.material.map) inputPlane.material.map.dispose();
+              inputPlane.material.map = makeCoralTexture();
+              inputPlane.material.needsUpdate = true;
+            }
+            
+            fmapPlanes.forEach((p, i) => {
+              if (p && p.material) {
+                if (p.material.map) p.material.map.dispose();
+                p.material.map = makeFmapTexture(i, i*1.4);
+                p.material.needsUpdate = true;
+              }
+            });
+            
+            // Recreate default geometries/positions
+            if (window.updateAlphaBarsGeometry) window.updateAlphaBarsGeometry();
+            
             heatmapPlane.material.map = buildHeatmapTexture(selectedClass);
             heatmapPlane.material.needsUpdate = true;
             flashClassSub(selectedClass);
+            
+            // De-select sample thumbnails
+            document.querySelectorAll('.gc3d-sample-card').forEach(c => {
+              c.classList.remove('border-teal-500/60', 'bg-teal-950/40');
+              c.classList.add('border-teal-500/10', 'bg-slate-950/40');
+            });
+            
+            // Reset HUD telemetry back to system online
+            const hudStatus = document.getElementById('hud-status');
+            if (hudStatus) {
+              hudStatus.textContent = 'SYSTEM_ONLINE';
+              hudStatus.className = 'text-teal-200 font-semibold tracking-wider';
+            }
+            const hudGflops = document.getElementById('hud-gflops');
+            if (hudGflops) {
+              hudGflops.textContent = '0.00 GFLOPs';
+            }
+            
+            gcReset();
           });
 
           window.addEventListener('resize', onResize);
@@ -2093,8 +2320,129 @@
           camera.updateProjectionMatrix();
         }
 
+        // Subagent 3 Mouse Movements
+        function onMouseMove(event) {
+          const wrap = document.getElementById('gc3d-wrap');
+          const rect = wrap.getBoundingClientRect();
+          mouse.x = ((event.clientX - rect.left) / wrap.clientWidth) * 2 - 1;
+          mouse.y = -((event.clientY - rect.top) / wrap.clientHeight) * 2 + 1;
+        }
+
+        function onMouseLeave() {
+          if (hoverReticle) hoverReticle.visible = false;
+          if (hoverHUD) hoverHUD.style.opacity = '0';
+          hoveredObject = null;
+        }
+
+        // Subagent 3 raycast verification
+        function checkRaycast(){
+          if (!renderer || !camera || !hoverReticle || !hoverHUD) return;
+          raycaster.setFromCamera(mouse, camera);
+          
+          const targets = [...fmapPlanes, inputPlane, heatmapPlane].filter(obj => obj && obj.visible && obj.material && obj.material.opacity > 0.05);
+          const intersects = raycaster.intersectObjects(targets);
+          
+          if (intersects.length > 0) {
+            const hit = intersects[0];
+            hoveredObject = hit.object;
+            
+            hoverReticle.visible = true;
+            hoverReticle.material.opacity = 0.95;
+            hoverReticle.position.copy(hit.point);
+            if (hoveredObject === inputPlane || hoveredObject === heatmapPlane) {
+              hoverReticle.position.x += 0.04;
+            } else {
+              hoverReticle.position.x += 0.02;
+            }
+            hoverReticle.rotation.copy(hoveredObject.rotation);
+            
+            let uVal = 0, vVal = 0;
+            if (hit.uv) {
+              uVal = Math.round(hit.uv.x * 224);
+              vVal = Math.round(hit.uv.y * 224);
+            }
+            
+            let hudContent = '';
+            if (hoveredObject === inputPlane) {
+              hudContent = `
+                <div class="text-teal-400 font-bold border-b border-teal-500/25 pb-1 mb-1.5 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span> Input Image
+                </div>
+                <div>Coord: X:${uVal}, Y:${vVal}</div>
+                <div>Size: 224x224 RGB</div>
+                <div>Status: ACTIVE</div>
+              `;
+            } else if (hoveredObject === heatmapPlane) {
+              hudContent = `
+                <div class="text-rose-400 font-bold border-b border-rose-500/25 pb-1 mb-1.5 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Attention focus
+                </div>
+                <div>Coord: X:${uVal}, Y:${vVal}</div>
+                <div>Target: ${selectedClass}</div>
+                <div>Weight: MAX</div>
+              `;
+            } else {
+              const idx = fmapPlanes.indexOf(hoveredObject);
+              const weight = ALPHA_VALUES[idx];
+              const intensity = (0.2 + (weight/ALPHA_MAX)*0.6 + Math.sin(uVal*0.06)*Math.cos(vVal*0.06)*0.08) * 100;
+              hudContent = `
+                <div class="text-sky-400 font-bold border-b border-sky-500/25 pb-1 mb-1.5 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span> Detector #${idx+1}
+                </div>
+                <div>Coord: X:${uVal}, Y:${vVal}</div>
+                <div>Weight &alpha;: ${weight.toFixed(2)}</div>
+                <div>Intensity: ${intensity.toFixed(1)}%</div>
+              `;
+            }
+            
+            hoverHUD.innerHTML = hudContent;
+            hoverHUD.style.opacity = '1';
+            
+            const wrapEl = document.getElementById('gc3d-wrap');
+            const W = wrapEl.clientWidth, H = wrapEl.clientHeight;
+            const screenPos = hit.point.clone().project(camera);
+            const x = (screenPos.x + 1)/2 * W;
+            const y = (-screenPos.y + 1)/2 * H;
+            
+            hoverHUD.style.left = (x + 15) + 'px';
+            hoverHUD.style.top  = (y - 30) + 'px';
+          } else {
+            hoverReticle.visible = false;
+            hoverHUD.style.opacity = '0';
+            hoveredObject = null;
+          }
+        }
+
+        // Subagent 5 Live Telemetry Tickers
+        function animateTelemetry(step) {
+          const stats = {
+            0: { gflops: 0.00, status: 'SYSTEM_ONLINE' },
+            1: { gflops: 0.03, status: 'FORWARD_PASS_CALC' },
+            2: { gflops: 0.09, status: 'BACKPROPAGATION_TRACE' },
+            3: { gflops: 0.11, status: 'GLOBAL_AVERAGE_POOL' },
+            4: { gflops: 0.12, status: 'HEATMAP_RELU_FUSION' }
+          };
+          const current = stats[step] || stats[0];
+          
+          const statusBadge = document.getElementById('hud-status');
+          if (statusBadge) statusBadge.textContent = current.status;
+          
+          const gflopsEl = document.getElementById('hud-gflops');
+          if (gflopsEl) {
+            gsap.killTweensOf(gflopsEl);
+            const obj = { val: 0 };
+            gsap.to(obj, {
+              val: current.gflops,
+              duration: 0.8,
+              ease: 'power2.out',
+              onUpdate: () => { gflopsEl.textContent = obj.val.toFixed(2) + ' GFLOPs'; }
+            });
+          }
+        }
+
         const _clock = (typeof performance !== 'undefined') ? performance : { now: function(){ return Date.now(); } };
         let _lastT = _clock.now();
+        
         function animate(){
           requestAnimationFrame(animate);
           const now = _clock.now();
@@ -2102,21 +2450,25 @@
           _lastT = now;
           if (controls) controls.update();
 
-          // Advance Step 2 flow dots along their path
+          // Subagent 1: Rotate fmap scanning rings
+          fmapPlanes.forEach(function(p){
+            if (p.userData.scanRing && p.userData.scanRing.material.opacity > 0.01) {
+              p.userData.scanRing.rotation.z += dt * 0.45;
+            }
+          });
+
+          // Subagent 2: Bezier Spline gradient particles
           if (flowDots.length) {
-            const start = classNode ? classNode.position : new THREE.Vector3(5.2,0,0);
             flowDots.forEach(function(fd){
               if (!fd.active) return;
-              fd.t += dt * 0.55;
+              fd.t += dt * 0.65;
               if (fd.t > 1) fd.t = 0;
-              const end = fmapPlanes[fd.fmapIndex].position;
-              const tt = fd.t;
-              fd.mesh.position.x = start.x*(1-tt) + end.x*tt;
-              fd.mesh.position.y = start.y*(1-tt) + end.y*tt + Math.sin(tt*Math.PI)*0.25;
-              fd.mesh.position.z = start.z*(1-tt) + end.z*tt;
-              // Fade in then out across the path
-              const fade = Math.sin(tt*Math.PI);
-              fd.mesh.material.opacity = fade * 0.95;
+              const curve = curves[fd.fmapIndex];
+              const pos = curve.getPointAt(fd.t);
+              fd.mesh.position.copy(pos);
+              
+              // Fade in and out along path
+              fd.mesh.material.opacity = Math.sin(fd.t * Math.PI) * 0.95;
             });
           }
 
@@ -2131,7 +2483,10 @@
             }
           }
 
-          if (renderer && scene && camera) renderer.render(scene, camera);
+          if (renderer && scene && camera) {
+            checkRaycast(); // Run Raycasting
+            renderer.render(scene, camera);
+          }
           updateLabels();
         }
 
@@ -2147,17 +2502,38 @@
             card.classList.remove('is-active-1','is-active-2','is-active-3','is-active-4');
             if (n === step) card.classList.add('is-active-'+n);
           });
+          animateTelemetry(step); // Trigger Telemetry change
         }
 
         // ---- Step 1: Forward Pass ------------------------------------------
-        // Input image "projects" into stack of feature maps via glowing beams.
         function animateStep1(){
           const tl = gsap.timeline();
           tl.to(inputPlane.material, { emissiveIntensity: 0.8, duration: 0.45, ease: 'power2.out' });
-          // Beams light up first, then feature maps materialize at each beam's endpoint.
+          
+          // Beams light up
           beamLines.forEach(function(line, i){
-            tl.to(line.material, { opacity: 0.55, duration: 0.25 }, 0.2 + i*0.08);
+            tl.to(line.material, { opacity: 0.5, duration: 0.25 }, 0.2 + i*0.08);
           });
+
+          // Subagent 2: Sequentially fire signals down the beams
+          signalParticles.forEach(function(dots, i){
+            dots.forEach(function(dot, j){
+              dot.position.set(-6, 0, 0);
+              dot.material.opacity = 0;
+              const delay = 0.22 + i*0.08 + j*0.2;
+              tl.to(dot.position, {
+                x: FMAP_BASE_X,
+                y: 0,
+                z: FMAP_Z[i],
+                duration: 0.75,
+                ease: 'power1.inOut',
+                onStart: () => { dot.material.opacity = 0.95; },
+                onComplete: () => { dot.material.opacity = 0; }
+              }, delay);
+            });
+          });
+
+          // Feature maps materialize
           fmapPlanes.forEach(function(p, i){
             setLabelVisible(p, true);
             tl.fromTo(p.position,
@@ -2165,11 +2541,15 @@
               { x: FMAP_BASE_X, duration: 0.55, ease: 'power2.out' },
               0.3 + i*0.1);
             tl.fromTo(p.material,
-              { opacity: 0 },
+              { opacity: 0.15 },
               { opacity: FMAP_INITIAL_OPACITY, duration: 0.55 },
               '<');
             tl.to(p.userData.edges.material, { opacity: 0.9, duration: 0.45 }, '<');
+            
+            // Subagent 1: Turn scanning ring on
+            tl.to(p.userData.scanRing.material, { opacity: 0.45, duration: 0.45 }, '<');
           });
+
           // Beams fade after planes are formed
           beamLines.forEach(function(line, i){
             tl.to(line.material, { opacity: 0.0, duration: 0.5 }, 1.4 + i*0.05);
@@ -2178,16 +2558,15 @@
         }
 
         // ---- Step 2: Backpropagation ---------------------------------------
-        // Class node appears at right; glowing red arrows flow BACKWARDS
-        // (from class node toward each feature map). Feature maps tint orange.
         function animateStep2(){
+          killStep2DelayedCalls();
           setLabelVisible(classNode, true);
           const tl = gsap.timeline();
           tl.to(classNode.scale, { x:1, y:1, z:1, duration: 0.55, ease: 'back.out(2)' });
           gsap.to(classNode.material, { emissiveIntensity: 1.1, duration: 0.6, repeat: -1, yoyo: true });
 
           gradArrows.forEach(function(arrow, i){
-            gsap.delayedCall(0.45 + i*0.13, function(){
+            const dc = gsap.delayedCall(0.45 + i*0.13, function(){
               arrow.visible = true;
               const len = arrow.userData.fullLen;
               const obj = { v: 0 };
@@ -2195,7 +2574,6 @@
                 v: 1, duration: 0.55, ease: 'power2.out',
                 onUpdate: function(){ arrow.setLength(obj.v * len, 0.45, 0.28); }
               });
-              // Pulsing opacity on arrow line + cone for "flow" feel
               gsap.fromTo(arrow.line.material,
                 { opacity: 0.35 },
                 { opacity: 1.0, duration: 0.55, repeat: -1, yoyo: true, ease: 'sine.inOut' });
@@ -2203,39 +2581,41 @@
                 { opacity: 0.5 },
                 { opacity: 1.0, duration: 0.55, repeat: -1, yoyo: true, ease: 'sine.inOut' });
             });
+            step2DelayedCalls.push(dc);
           });
 
           // Feature maps tint orange to indicate "gradients received"
-          gsap.delayedCall(1.3, function(){
+          const dcTint = gsap.delayedCall(1.2, function(){
             fmapPlanes.forEach(function(p){
               gsap.to(p.material.color, { r: 0.99, g: 0.69, b: 0.42, duration: 0.5 });
               gsap.to(p.userData.edges.material.color, { r: 0.97, g: 0.45, b: 0.09, duration: 0.5 });
+              if (p.userData.scanRing) gsap.to(p.userData.scanRing.material.color, { r: 0.97, g: 0.45, b: 0.09, duration: 0.5 });
             });
           });
+          step2DelayedCalls.push(dcTint);
 
-          // Activate red flow dots travelling class-node -> feature-maps (visualizes the "backward" direction)
-          gsap.delayedCall(0.9, function(){
+          // Activate Subagent 2: Bezier spline-guided orange-red packets
+          const dcPackets = gsap.delayedCall(0.85, function(){
             flowDots.forEach(function(fd, i){
               fd.active = true;
-              fd.t = (i * 0.13) % 1;
+              fd.t = (i * 0.14) % 1;
               fd.mesh.visible = true;
             });
           });
+          step2DelayedCalls.push(dcPackets);
 
-          // One-time popover near class node, auto-dismisses after 3s
           if (backpropPopover) {
             backpropPopover.classList.add('visible');
-            gsap.delayedCall(3.0, function(){
+            const dcPopover = gsap.delayedCall(3.2, function(){
               if (backpropPopover) backpropPopover.classList.remove('visible');
             });
+            step2DelayedCalls.push(dcPopover);
           }
         }
 
         // ---- Step 3: Pool alpha_k ------------------------------------------
-        // Each feature map CONDENSES vertically into a thin slice at x=4
-        // and the alpha bar rises in its place.
         function animateStep3(){
-          // Stop arrow pulsing + hide arrows
+          killStep2DelayedCalls();
           gradArrows.forEach(function(a){
             gsap.killTweensOf(a.line.material);
             gsap.killTweensOf(a.cone.material);
@@ -2244,7 +2624,7 @@
           gsap.killTweensOf(classNode.material);
           gsap.to(classNode.material, { emissiveIntensity: 0.5, duration: 0.4 });
 
-          // Stop Step 2 flow dots
+          // Stop Bezier particles
           flowDots.forEach(function(fd){
             fd.active = false;
             fd.mesh.visible = false;
@@ -2253,23 +2633,34 @@
           if (backpropPopover) backpropPopover.classList.remove('visible');
 
           const tl = gsap.timeline();
-          // Slide feature maps to bar X position
+          
+          // Slide feature maps and their scanRings to bar X position
           tl.to(fmapPlanes.map(function(p){return p.position;}), {
             x: 4, duration: 0.55, stagger: 0.08, ease: 'power2.inOut'
           });
+          fmapPlanes.forEach(function(p, i){
+            if (p.userData.scanRing) {
+              tl.to(p.userData.scanRing.position, {
+                x: 4, duration: 0.55, ease: 'power2.inOut'
+              }, i * 0.08);
+            }
+          });
 
-          // === Averaging beat: collapse each map's footprint toward its center
-          // (pixels gather instead of vanishing) and emit a brightness pulse.
+          // Collapse footprint vertically (Averaging)
           tl.to(fmapPlanes.map(function(p){return p.scale;}), {
             x: 0.08, z: 0.08, duration: 0.55, stagger: 0.06, ease: 'power2.in'
           }, '-=0.15');
-          // Brightness pulse so the collapse reads as "averaging" not "deletion"
           fmapPlanes.forEach(function(p){
-            if (p.material.emissive) p.material.emissive.setHex(0xfde047);
-            tl.to(p.material, { emissiveIntensity: 0.7, duration: 0.18, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '-=0.45');
+            if (p.userData.scanRing) tl.to(p.userData.scanRing.scale, { x: 0.05, y: 0.05, duration: 0.45 }, '-=0.45');
           });
 
-          // Reveal violet pool arrows pointing down toward each alpha bar
+          // Brightness pulse
+          fmapPlanes.forEach(function(p){
+            if (p.material.emissive) p.material.emissive.setHex(0xfde047);
+            tl.to(p.material, { emissiveIntensity: 0.75, duration: 0.18, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '-=0.45');
+          });
+
+          // Pool arrows materialize
           poolArrows.forEach(function(a, i){
             a.visible = true;
             a.line.material.opacity = 0;
@@ -2278,24 +2669,27 @@
             tl.to(a.cone.material, { opacity: 0.95, duration: 0.25 }, '<');
           });
 
-          // Now fade out the collapsed slivers + their edges so the pour-down is clean
+          // Collapse completely and fade
           tl.to(fmapPlanes.map(function(p){return p.material;}), {
             opacity: 0, duration: 0.35, stagger: 0.04
           }, '+=0.05');
           tl.to(fmapPlanes.map(function(p){return p.userData.edges.material;}), {
             opacity: 0, duration: 0.35, stagger: 0.04
           }, '<');
+          fmapPlanes.forEach(function(p){
+            if (p.userData.scanRing) tl.to(p.userData.scanRing.material, { opacity: 0, duration: 0.35 }, '<');
+          });
 
-          // Hide fmap labels, show bar labels
+          // Swap labels
           fmapPlanes.forEach(function(p){ setLabelVisible(p, false); });
           alphaBars.forEach(function(b){ setLabelVisible(b, true); });
-          // Bars rise from the slot where the maps just collapsed
           alphaBars.forEach(function(b){ b.visible = true; });
+          
           tl.to(alphaBars.map(function(b){return b.scale;}), {
             y: 1, duration: 0.55, stagger: 0.1, ease: 'back.out(1.4)'
           }, '-=0.15');
 
-          // Fade out pool arrows once bars have settled
+          // Fade out pool arrows
           poolArrows.forEach(function(a){
             tl.to(a.line.material, { opacity: 0, duration: 0.4 }, '-=0.1');
             tl.to(a.cone.material, { opacity: 0, duration: 0.4 }, '<');
@@ -2306,41 +2700,58 @@
         }
 
         // ---- Step 4: Weighted Sum + ReLU + Heatmap -------------------------
-        // 1. Each map reappears at the heatmap location, scaled by its alpha.
-        // 2. They merge into a single dark plane (sum).
-        // 3. ReLU clip flash, then colormap fades in for the final heatmap.
         function animateStep4(){
+          killStep2DelayedCalls();
           const tl = gsap.timeline();
+          
           // Bars shrink down (consumed into weighting)
           tl.to(alphaBars.map(function(b){return b.scale;}), {
             y: 0.0001, duration: 0.45, stagger: 0.05, ease: 'power2.in'
           });
           alphaBars.forEach(function(b){ setLabelVisible(b, false); });
 
-          // Reappear feature maps over the input, scaled by their alpha weight,
-          // then fly them in to merge at the input location.
+          // Reappear feature maps, scale by weight, and fly to merge at input position
           fmapPlanes.forEach(function(p, i){
             p.scale.set(1,1,1);
-            const alpha = ALPHA_VALUES[i] / ALPHA_MAX; // 0..1
+            const alpha = ALPHA_VALUES[i] / ALPHA_MAX;
             tl.set(p.position, { x: 4, y: 0, z: FMAP_Z[i] }, '<');
             tl.set(p.material, { opacity: 0 }, '<');
             tl.set(p.userData.edges.material, { opacity: 0 }, '<');
-            // Show map briefly, scaled by alpha (the visible "multiply")
+            
             tl.to(p.material, { opacity: 0.55 * alpha + 0.15, duration: 0.3 }, '-=0.35');
             tl.to(p.scale, { x: alpha, y: alpha, duration: 0.35 }, '<');
-            // Travel to input position
             tl.to(p.position, { x: -6, y: 0, z: 0.04, duration: 0.6, ease: 'power2.inOut' }, '-=0.15');
             tl.to(p.material, { opacity: 0, duration: 0.4 }, '-=0.2');
           });
 
-          // Merge plane (sum) materializes dark, then ReLU flash, then heatmap reveals
+          // Merge plane materializes dark
           tl.to(mergePlane.material, { opacity: 0.7, duration: 0.5 }, '-=0.4');
-          // ReLU flash: quick white emissive pulse on input plane
-          tl.to(inputPlane.material, { emissiveIntensity: 0.9, duration: 0.25, yoyo: true, repeat: 1 }, '+=0.1');
-          // Heatmap colormap reveals
+          
+          // Subagent 4: ReLU scanner line sweeps across horizontally
+          tl.set(scannerLine, { visible: true });
+          tl.fromTo(scannerLine.position, { x: -7.5 }, { x: -4.5, duration: 1.5, ease: 'power1.inOut' }, '-=0.2');
+          tl.fromTo(scannerLine.material, { opacity: 0 }, { opacity: 1.0, duration: 0.3, yoyo: true, repeat: 1 }, '<');
+
+          // Emissive sweep flash on input plane (visualizes ReLU trigger)
+          tl.to(inputPlane.material, { emissiveIntensity: 0.95, duration: 0.25, yoyo: true, repeat: 1 }, '+=0.05');
+          
+          // Heatmap colormap reveals behind sweep
           setLabelVisible(heatmapPlane, true);
-          tl.to(heatmapPlane.material, { opacity: 0.85, duration: 1.1, ease: 'power2.out' }, '<');
+          tl.to(heatmapPlane.material, { opacity: 0.88, duration: 1.1, ease: 'power2.out' }, '<');
           tl.to(mergePlane.material, { opacity: 0, duration: 0.8 }, '<');
+          tl.set(scannerLine, { visible: false });
+
+          // Subagent 4: Cinematic camera sweep close-focus on coordinate focus area
+          tl.to(camera.position, {
+            x: -6.5,
+            y: 0.6,
+            z: 5.5,
+            duration: 1.8,
+            ease: 'power2.inOut',
+            onUpdate: function(){
+              controls.target.set(-6, 0, 0);
+            }
+          }, 0.2);
         }
 
         // ---- Narration content ---------------------------------------------
@@ -2394,12 +2805,17 @@
           try { sessionStorage.setItem('gc3d-onboarded', '1'); } catch(e) {}
         }
 
+        function killStep2DelayedCalls() {
+          step2DelayedCalls.forEach(function(dc) { if (dc) dc.kill(); });
+          step2DelayedCalls = [];
+        }
+
         // ---- Step controller -----------------------------------------------
         window.gcSetStep = function(step){
           if (!renderer) return;
+          killStep2DelayedCalls();
           if (step === currentStep) return;
           if (step < currentStep) { gcReset(); }
-          // If user jumps forward, replay intermediate steps so visuals make sense
           if (step > currentStep + 1) {
             for (let s = currentStep + 1; s < step; s++) {
               if (s === 1) animateStep1();
@@ -2418,23 +2834,93 @@
 
         window.gcReset = function(){
           if (!renderer) return;
+          killStep2DelayedCalls();
+          
+          // Kill all targeted tweens on every animated object BEFORE clearing timeline.
+          // gsap.killTweensOf('*') is invalid in GSAP 3 — it silently fails,
+          // leaving zombie tweens (e.g. Step 2 orange tint) that override resets.
+          gsap.killTweensOf(camera.position);
+          gsap.killTweensOf(inputPlane.material);
+          gsap.killTweensOf(heatmapPlane.material);
+          if (mergePlane) gsap.killTweensOf(mergePlane.material);
+          if (scannerLine) {
+            gsap.killTweensOf(scannerLine.position);
+            gsap.killTweensOf(scannerLine.material);
+          }
+          gsap.killTweensOf(classNode.scale);
+          gsap.killTweensOf(classNode.material);
+          fmapPlanes.forEach(function(p){
+            gsap.killTweensOf(p.position);
+            gsap.killTweensOf(p.scale);
+            gsap.killTweensOf(p.material);
+            gsap.killTweensOf(p.material.color);
+            if (p.userData.edges) gsap.killTweensOf(p.userData.edges.material);
+            if (p.userData.edges) gsap.killTweensOf(p.userData.edges.material.color);
+            if (p.userData.scanRing) {
+              gsap.killTweensOf(p.userData.scanRing.position);
+              gsap.killTweensOf(p.userData.scanRing.scale);
+              gsap.killTweensOf(p.userData.scanRing.material);
+              gsap.killTweensOf(p.userData.scanRing.material.color);
+            }
+          });
+          alphaBars.forEach(function(b){
+            gsap.killTweensOf(b.scale);
+            gsap.killTweensOf(b.position);
+          });
+          beamLines.forEach(function(l){ gsap.killTweensOf(l.material); });
+          signalParticles.forEach(function(dots){
+            dots.forEach(function(dot){
+              gsap.killTweensOf(dot.position);
+              gsap.killTweensOf(dot.material);
+            });
+          });
+          gradArrows.forEach(function(a){
+            gsap.killTweensOf(a.line.material);
+            gsap.killTweensOf(a.cone.material);
+          });
+          poolArrows.forEach(function(a){
+            gsap.killTweensOf(a.line.material);
+            gsap.killTweensOf(a.cone.material);
+          });
+          flowDots.forEach(function(fd){
+            gsap.killTweensOf(fd.mesh.position);
+            gsap.killTweensOf(fd.mesh.material);
+          });
+
+          // Now safe to clear global timeline
           gsap.globalTimeline.clear();
-          gsap.killTweensOf('*');
           currentStep = 0;
+
+          // Subagent 4: Restore camera default position
+          camera.position.set(0, 4.5, 15);
+          controls.target.set(0, 0, 0);
 
           inputPlane.material.emissiveIntensity = 0;
 
           fmapPlanes.forEach(function(p, i){
             p.position.set(FMAP_BASE_X, 0, FMAP_Z[i]);
             p.scale.set(1,1,1);
-            p.material.opacity = 0;
+            p.material.opacity = 0.15;
             p.material.color = new THREE.Color(p.userData.baseColor);
-            p.userData.edges.material.opacity = 0;
-            p.userData.edges.material.color = new THREE.Color(0x14b8a6);
+            p.userData.edges.material.opacity = 0.25;
+            p.userData.edges.material.color = new THREE.Color(GC_CLASSES[selectedClass].color);
+            if (p.userData.scanRing) {
+              p.userData.scanRing.position.set(FMAP_BASE_X, 0, FMAP_Z[i]);
+              p.userData.scanRing.scale.set(1,1,1);
+              p.userData.scanRing.material.opacity = 0.05;
+              p.userData.scanRing.material.color = new THREE.Color(GC_CLASSES[selectedClass].color);
+            }
             setLabelVisible(p, false);
           });
 
           beamLines.forEach(function(l){ l.material.opacity = 0; });
+
+          // Clear Subagent 2 Step 1 particles
+          signalParticles.forEach(function(dots){
+            dots.forEach(function(dot){
+              dot.material.opacity = 0;
+            });
+          });
 
           gradArrows.forEach(function(a){
             a.visible = false;
@@ -2443,8 +2929,8 @@
             a.setLength(a.userData.fullLen, 0.45, 0.28);
           });
 
-          classNode.scale.set(0,0,0);
-          classNode.material.emissiveIntensity = 0.6;
+          classNode.scale.set(0.7, 0.7, 0.7);
+          classNode.material.emissiveIntensity = 0.25;
           setLabelVisible(classNode, false);
 
           alphaBars.forEach(function(b, i){
@@ -2455,11 +2941,12 @@
           });
 
           if (mergePlane) mergePlane.material.opacity = 0;
+          if (scannerLine) scannerLine.visible = false;
           heatmapPlane.material.opacity = 0;
           setLabelVisible(heatmapPlane, false);
           setLabelVisible(inputPlane, true);
 
-          // Stop & hide Step 2 flow dots
+          // Stop Bezier particles
           flowDots.forEach(function(fd){
             fd.active = false;
             fd.mesh.visible = false;
@@ -2467,14 +2954,13 @@
           });
           if (backpropPopover) backpropPopover.classList.remove('visible');
 
-          // Hide Step 3 pool arrows
           poolArrows.forEach(function(a){
             a.visible = false;
             a.line.material.opacity = 0;
             a.cone.material.opacity = 0;
           });
 
-          // Restore feature-map emissive colors (Step 3 averaging beat set them to yellow)
+          // Restore emissive maps
           fmapPlanes.forEach(function(p){
             if (p.material.emissive) {
               p.material.emissive.setHex(0x000000);
@@ -2486,7 +2972,6 @@
           updateStepButtons(0);
         };
 
-        // Per-step dwell (seconds). Step 4 is longer because it's the payoff.
         const STEP_DWELL = { 1: 5.5, 2: 5.5, 3: 5.5, 4: 7.0 };
 
         function clearPlayQueue(){
@@ -2496,7 +2981,6 @@
           clearPlayQueue();
           if (!isPlaying) return;
           if (currentStep >= 4) {
-            // Loop back to overview after Step 4 dwells
             playCallId = gsap.delayedCall(STEP_DWELL[4], function(){
               if (!isPlaying) return;
               gcReset();
@@ -2541,7 +3025,6 @@
           const target = currentStep - 1;
           if (target === 0) { gcReset(); return; }
           gcReset();
-          // Replay up through the target step instantly
           for (let s = 1; s <= target; s++) {
             currentStep = s - 1;
             gcSetStep(s);
@@ -2555,7 +3038,6 @@
           gcSetStep(currentStep + 1);
         };
 
-        // Backwards-compat shim in case anything still calls gcAutoPlay
         window.gcAutoPlay = function(){
           if (!renderer) return;
           dismissOnboard();
@@ -2565,7 +3047,188 @@
           schedulePlay();
         };
 
-        // Plain-English / math toggle
+        // Subagent 2 & 3: Real activations & dataset sample integration
+        function applyBase64Texture(mesh, base64Data) {
+          if (!mesh || !base64Data) return;
+          if (mesh.material && mesh.material.map) {
+            mesh.material.map.dispose();
+          }
+          const loader = new THREE.TextureLoader();
+          const imageSrc = 'data:image/png;base64,' + base64Data;
+          loader.load(imageSrc, function(texture) {
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            mesh.material.map = texture;
+            mesh.material.needsUpdate = true;
+          });
+        }
+
+        window.updateAlphaBarsGeometry = function() {
+          alphaBars.forEach((bar, i) => {
+            const h = ALPHA_VALUES[i];
+            bar.geometry.dispose();
+            bar.geometry = new THREE.CylinderGeometry(0.2, 0.2, h, 24);
+            bar.position.set(4, h/2 - 1, FMAP_Z[i]);
+            
+            const arrow = poolArrows[i];
+            if (arrow) {
+              scene.remove(arrow);
+              const from = new THREE.Vector3(4, 1.4, FMAP_Z[i]);
+              const to   = new THREE.Vector3(4, h - 1, FMAP_Z[i]);
+              const dir  = to.clone().sub(from).normalize();
+              const len  = from.distanceTo(to);
+              const newArrow = new THREE.ArrowHelper(dir, from, len, 0xa78bfa, 0.22, 0.16);
+              newArrow.line.material.transparent = true;
+              newArrow.cone.material.transparent = true;
+              newArrow.line.material.opacity = 0;
+              newArrow.cone.material.opacity = 0;
+              newArrow.visible = false;
+              newArrow.userData.fullLen = len;
+              scene.add(newArrow);
+              poolArrows[i] = newArrow;
+            }
+          });
+        }
+
+        window.initGC3DSamples = function() {
+          const carouselContainer = document.getElementById('simulation-samples-list');
+          if (!carouselContainer) return;
+          fetch('/api/simulation_samples')
+            .then(res => {
+              if (!res.ok) throw new Error('API error');
+              return res.json();
+            })
+            .then(data => {
+              if (data.samples && data.samples.length > 0) {
+                renderSamplesCarousel(data.samples);
+              } else {
+                carouselContainer.innerHTML = '<div class="text-xs text-slate-500 font-mono py-2 w-full text-center">No proven samples available.</div>';
+              }
+            })
+            .catch(err => {
+              console.warn('Failed to load simulation samples, using procedural fallback:', err);
+              carouselContainer.innerHTML = '<div class="text-[11px] text-amber-500/80 font-mono py-2 w-full text-center">Procedural Demo Mode (Offline)</div>';
+            });
+        };
+
+        function renderSamplesCarousel(samples) {
+          const container = document.getElementById('simulation-samples-list');
+          if (!container) return;
+          container.innerHTML = '';
+          samples.forEach(sample => {
+            const card = document.createElement('div');
+            card.className = 'gc3d-sample-card flex-shrink-0 flex items-center gap-2.5 p-1.5 rounded-xl border border-teal-500/10 bg-slate-950/40 hover:bg-teal-950/30 hover:border-teal-500/40 transition-all duration-300 cursor-pointer select-none';
+            card.style.minWidth = '160px';
+            let dotColor = 'bg-emerald-400 shadow-[0_0_8px_#34d399]';
+            if (sample.class === 'Bleached') dotColor = 'bg-amber-400 shadow-[0_0_8px_#fbbf24]';
+            else if (sample.class === 'Dead') dotColor = 'bg-rose-400 shadow-[0_0_8px_#f87171]';
+            const thumbSrc = sample.thumbnail_b64 ? 'data:image/png;base64,' + sample.thumbnail_b64 : '/static/img/coral-placeholder.svg';
+            card.innerHTML = `
+              <img src="${thumbSrc}" class="w-10 h-10 rounded-lg object-cover border border-teal-500/20 shadow-inner" alt="${sample.name}" />
+              <div class="flex flex-col min-w-0">
+                <span class="text-[10px] font-bold text-slate-200 truncate pr-1 font-mono">${sample.name}</span>
+                <span class="text-[9px] text-slate-400 flex items-center gap-1 font-mono mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+                  ${sample.class}
+                </span>
+              </div>
+            `;
+            card.addEventListener('click', function() {
+              document.querySelectorAll('.gc3d-sample-card').forEach(c => {
+                c.classList.remove('border-teal-500/60', 'bg-teal-950/40');
+                c.classList.add('border-teal-500/10', 'bg-slate-950/40');
+              });
+              card.classList.remove('border-teal-500/10', 'bg-slate-950/40');
+              card.classList.add('border-teal-500/60', 'bg-teal-950/40');
+              selectSimulationSample(sample);
+            });
+            container.appendChild(card);
+          });
+        }
+
+        function selectSimulationSample(sample) {
+          const statusEl = document.getElementById('hud-status');
+          if (statusEl) {
+            statusEl.textContent = 'STREAMING_ACTIVATIONS';
+            statusEl.className = 'text-amber-400 font-semibold tracking-wider animate-pulse';
+          }
+          fetch('/api/simulation_inference', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: sample.path })
+          })
+          .then(res => {
+            if (!res.ok) throw new Error('Inference error');
+            return res.json();
+          })
+          .then(data => {
+            if (data.error) throw new Error(data.error);
+            
+            // 1. Calculate & Map dynamic heights
+            let rawAlphas = data.channels.map(c => Math.max(0, c.alpha_k));
+            let maxRaw = Math.max(...rawAlphas);
+            ALPHA_VALUES = rawAlphas.map(a => {
+              if (maxRaw === 0) return 0.5;
+              return 0.4 + (a / maxRaw) * 2.1;
+            });
+            ALPHA_MAX = Math.max.apply(null, ALPHA_VALUES);
+            
+            // 2. Recreate cylinders geometry
+            window.updateAlphaBarsGeometry();
+            
+            // 3. Swap 3D WebGL textures
+            applyBase64Texture(inputPlane, data.input_image_b64);
+            applyBase64Texture(heatmapPlane, data.heatmap_base64);
+            data.channels.forEach((chan, idx) => {
+              if (fmapPlanes[idx]) {
+                applyBase64Texture(fmapPlanes[idx], chan.texture_base64);
+              }
+            });
+            
+            // 4. Update predicted class and sync UI color styling
+            selectedClass = data.prediction;
+            const c = GC_CLASSES[selectedClass].color;
+            classNode.material.color.setHex(c);
+            classNode.material.emissive.setHex(c);
+            alphaBars.forEach(b => {
+              b.material.color.setHex(c);
+              b.material.emissive.setHex(c);
+            });
+            
+            fmapPlanes.forEach(p => {
+              if (p.userData.edges && p.userData.edges.material) {
+                p.userData.edges.material.color.setHex(c);
+              }
+              if (p.userData.scanRing && p.userData.scanRing.material) {
+                p.userData.scanRing.material.color.setHex(c);
+              }
+            });
+            
+            const sel = document.getElementById('gc3d-class');
+            if (sel) sel.value = selectedClass;
+            
+            // 5. Update telemetries
+            if (statusEl) {
+              statusEl.textContent = 'INFERENCE_OK';
+              statusEl.className = 'text-emerald-400 font-semibold tracking-wider shadow-[0_0_8px_#10b981]';
+            }
+            const gflopsEl = document.getElementById('hud-gflops');
+            if (gflopsEl) {
+              gflopsEl.textContent = `LATENCY: ${data.inference_time_ms.toFixed(1)}ms`;
+            }
+            
+            // Reset timeline smoothly and preserve loaded textures
+            gcReset();
+          })
+          .catch(err => {
+            console.error('Dynamic inference failed:', err);
+            if (statusEl) {
+              statusEl.textContent = 'STREAM_FAILED';
+              statusEl.className = 'text-rose-500 font-semibold tracking-wider';
+            }
+          });
+        }
+
         window.gcToggleFormula = function(){
           const plain = document.getElementById('gc3d-formula-plain');
           const math  = document.getElementById('gc3d-formula-math');
@@ -2580,7 +3243,6 @@
             math.classList.remove('hidden');
             plain.classList.add('hidden');
             btn.textContent = 'Hide math';
-            // Re-apply current step's pill highlighting
             updateNarration(currentStep);
           }
         };
@@ -2590,7 +3252,7 @@
     <!-- End GradCAM 3D Simulation Section -->
 
     <!-- Try Model Section -->
-    <section id="try-model" class="py-24 bg-gradient-to-br from-slate-50 via-teal-50/40 to-blue-50/60 border-t border-outline-variant/30 relative overflow-hidden" aria-labelledby="try-model-heading">
+    <section id="try-model" class="py-24 border-t border-outline-variant/30 relative overflow-hidden" style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,251,235,0.6), transparent 50%), radial-gradient(circle 40rem at 50% 70%, rgba(20,184,166,0.10), transparent), linear-gradient(180deg, #f0fdfa 0%, #ecfeff 50%, #eff6ff 100%);" aria-labelledby="try-model-heading">
       <!-- Ambient background accents -->
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-0">
         <div class="absolute -top-32 -left-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl"></div>

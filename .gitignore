@@ -41,6 +41,9 @@ Dataset/
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+Desktop.ini
+
 
 # Logs
 *.log
@@ -59,4 +62,6 @@ logs/
 
 # Pyre (type checker)
 .pyre_configuration
-.pyre/
+
+# MCP Local settings
+.mcp.json
